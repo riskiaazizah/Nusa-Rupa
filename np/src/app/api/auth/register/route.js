@@ -1,39 +1,29 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { query } from "@/lib/db";
+import { validateRegister } from "@/lib/validators";
+import { createUser } from "@/lib/users";
+import { createSession } from "@/lib/session";
+import { homePathFor } from "@/lib/roles";
 
-export async function POST(req) {
-  const { username, email, password, role } = await req.json();
-
-  if (!username?.trim() || !email?.trim() || !password) {
-    return NextResponse.json({ error: "Semua field wajib diisi." }, { status: 400 });
-  }
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    return NextResponse.json({ error: "Format email tidak valid." }, { status: 400 });
-  }
-  if (password.length < 8) {
-    return NextResponse.json({ error: "Password minimal 8 karakter." }, { status: 400 });
-  }
-  if (!["member", "curator"].includes(role)) {
-    return NextResponse.json({ error: "Role tidak valid." }, { status: 400 });
+export async function POST(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Body request tidak valid." }, { status: 400 });
   }
 
-  const exists = await query(
-    "SELECT 1 FROM users WHERE email = $1 OR username = $2",
-    [email.trim().toLowerCase(), username.trim()]
-  );
-  if (exists.length) {
-    return NextResponse.json({ error: "Email atau username sudah dipakai." }, { status: 409 });
+  const { ok, errors, data } = validateRegister(body);
+  if (!ok) return NextResponse.json({ errors }, { status: 400 });
+
+  try {
+    const user = await createUser(data);
+    await createSession(user);
+    return NextResponse.json({ ok: true, redirectTo: homePathFor(user) }, { status: 201 });
+  } catch (err) {
+    if (err.code === "23505") {
+      return NextResponse.json({ errors: { email: "Email sudah terdaftar." } }, { status: 409 });
+    }
+    console.error(err);
+    return NextResponse.json({ error: "Terjadi kesalahan pada server." }, { status: 500 });
   }
-
-  const hash = await bcrypt.hash(password, 10);
-  const status = role === "curator" ? "pending" : "approved";
-
-  await query(
-    `INSERT INTO users (username, email, password_hash, role, status, display_name)
-     VALUES ($1, $2, $3, $4, $5, $1)`,
-    [username.trim(), email.trim().toLowerCase(), hash, role, status]
-  );
-
-  return NextResponse.json({ ok: true, status }, { status: 201 });
 }

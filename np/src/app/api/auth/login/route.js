@@ -1,32 +1,30 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { query } from "@/lib/db";
-import { signToken, COOKIE_NAME } from "@/lib/auth";
+import { validateLogin } from "@/lib/validators";
+import { verifyCredentials } from "@/lib/users";
+import { createSession } from "@/lib/session";
+import { homePathFor } from "@/lib/roles";
 
-export async function POST(req) {
-  const { email, password } = await req.json();
-
-  if (!email || !password) {
-    return NextResponse.json({ error: "Email dan password wajib diisi." }, { status: 400 });
+export async function POST(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Body request tidak valid." }, { status: 400 });
   }
 
-  const [user] = await query("SELECT * FROM users WHERE email = $1", [
-    email.trim().toLowerCase(),
-  ]);
+  const { ok, errors, data } = validateLogin(body);
+  if (!ok) return NextResponse.json({ errors }, { status: 400 });
 
-  if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    return NextResponse.json({ error: "Email atau password salah." }, { status: 401 });
+  try {
+    const user = await verifyCredentials(data.email, data.password);
+    if (!user) {
+      // Pesan sengaja umum: tidak membocorkan apakah email terdaftar
+      return NextResponse.json({ error: "Email atau password salah." }, { status: 401 });
+    }
+    await createSession(user);
+    return NextResponse.json({ ok: true, redirectTo: homePathFor(user) });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: "Terjadi kesalahan pada server." }, { status: 500 });
   }
-
-  const token = await signToken({ id: user.id, role: user.role, status: user.status });
-
-  const res = NextResponse.json({ ok: true, role: user.role, status: user.status });
-  res.cookies.set(COOKIE_NAME, token, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 7,
-    secure: process.env.NODE_ENV === "production",
-  });
-  return res;
 }
