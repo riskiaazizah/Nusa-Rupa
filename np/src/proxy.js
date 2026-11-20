@@ -1,32 +1,64 @@
+
 import { NextResponse } from "next/server";
-import { verifyToken, COOKIE_NAME } from "@/lib/auth";
+import { SESSION_COOKIE, verifySession } from "@/lib/jwt";
 
-// DILARANG memanggil pg / database di file ini.
-// Proxy (dulu: middleware) hanya membaca cookie dan memeriksa token.
-export async function proxy(req) {
-  const { pathname } = req.nextUrl;
-  const token = req.cookies.get(COOKIE_NAME)?.value;
-  const user = token ? await verifyToken(token) : null;
-  const go = (path) => NextResponse.redirect(new URL(path, req.url));
+// Pemeriksaan awal akses berdasarkan role.
+// Tidak melakukan koneksi database.
+// Status curator diperiksa di server melalui roles.js / session.js.
 
-  if (!user) return go(`/login?next=${encodeURIComponent(pathname)}`);
+const ROLE_BY_PREFIX = {
+  "/admin": "admin",
+  "/dashboard/member": "member",
+  "/dashboard/curator": "curator",
+  "/pending-curator": "curator",
+};
 
-  if (pathname.startsWith("/admin") && user.role !== "admin") return go("/");
+export async function proxy(request) {
+  const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/dashboard/member") && user.role !== "member") return go("/");
+  // Cari route yang membutuhkan autentikasi.
+  const prefix = Object.keys(ROLE_BY_PREFIX).find(
+    (path) => pathname === path || pathname.startsWith(path + "/")
+  );
 
-  if (pathname.startsWith("/dashboard/curator")) {
-    if (user.role !== "curator") return go("/");
-    if (user.status !== "approved") return go("/pending-curator");
+  // Route publik tidak perlu diperiksa.
+  if (!prefix) {
+    return NextResponse.next();
   }
 
-  if (pathname.startsWith("/pending-curator")) {
-    if (user.role !== "curator" || user.status === "approved") return go("/");
+  // Ambil session dari cookie.
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+
+  // Verifikasi token.
+  const session = token ? await verifySession(token) : null;
+
+  // Jika belum login atau token tidak valid.
+  if (!session) {
+    const loginUrl = new URL("/login", request.url);
+
+    loginUrl.searchParams.set(
+      "next",
+      pathname + request.nextUrl.search
+    );
+
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Periksa kecocokan role dengan route.
+  const requiredRole = ROLE_BY_PREFIX[prefix];
+
+  if (session.role !== requiredRole) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*", "/pending-curator"],
+  matcher: [
+    "/admin/:path*",
+    "/dashboard/member/:path*",
+    "/dashboard/curator/:path*",
+    "/pending-curator/:path*",
+  ],
 };
