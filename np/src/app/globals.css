@@ -1,26 +1,16 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Palet TIGA · Art for Earth. Pakai: bg-forest, text-deep-forest, bg-sage, bg-ivory, text-earth */
+@theme {
+  --color-deep-forest: #172c23;
+  --color-forest: #3e6448;
+  --color-sage: #a9be8b;
+  --color-ivory: #e9e8d9;
+  --color-earth: #c56e4a;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-ivory);
+  color: var(--color-deep-forest);
 }
