@@ -47,3 +47,46 @@ export function validateCategoryName(name) {
   }
   return null;
 }
+
+
+// "Forest Fire, peatland ,forest fire" -> ["forest fire", "peatland"]
+export function parseTags(raw) {
+  const seen = new Set();
+  for (const part of String(raw ?? "").split(",")) {
+    const tag = part.trim().toLowerCase().replace(/\s+/g, " ");
+    if (tag) seen.add(tag);
+  }
+  return [...seen];
+}
+
+// Dipakai untuk create dan edit karya. File divalidasi terpisah (lib/uploads.js).
+export function validateArtworkInput(input = {}) {
+  const errors = {};
+  const title = String(input.title ?? "").trim();
+  const description = String(input.description ?? "").trim();
+  const categoryId = Number(input.categoryId);
+  const tags = parseTags(input.tags);
+
+  if (title.length < 3 || title.length > 150) {
+    errors.title = "Judul harus 3–150 karakter.";
+  }
+  if (description.length < 10 || description.length > 2000) {
+    errors.description = "Deskripsi harus 10–2000 karakter.";
+  }
+  if (!Number.isInteger(categoryId) || categoryId <= 0) {
+    errors.categoryId = "Pilih kategori karya.";
+  }
+  if (tags.length < 1) {
+    errors.tags = "Isi minimal 1 tag (pisahkan dengan koma).";
+  } else if (tags.length > 10) {
+    errors.tags = "Maksimal 10 tag.";
+  } else if (tags.some((t) => t.length > 50)) {
+    errors.tags = "Setiap tag maksimal 50 karakter.";
+  }
+
+  return {
+    ok: Object.keys(errors).length === 0,
+    errors,
+    data: { title, description, categoryId, tags },
+  };
+}

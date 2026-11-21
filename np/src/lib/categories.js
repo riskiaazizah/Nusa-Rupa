@@ -53,3 +53,10 @@ export async function deleteCategory(id) {
     ? { status: "in_use", count: rows[0].count }
     : { status: "not_found" };
 }
+
+
+// Untuk dropdown kategori di form karya
+export async function listCategories() {
+  const rows = await query(`SELECT id, name FROM categories ORDER BY LOWER(name)`);
+  return rows;
+}
