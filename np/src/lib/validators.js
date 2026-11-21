@@ -37,3 +37,13 @@ export function validateLogin(input = {}) {
 
   return { ok: Object.keys(errors).length === 0, errors, data: { email, password } };
 }
+
+
+// Nama kategori: wajib, 2–100 karakter. Keunikan dijaga database (unique index LOWER(name)).
+export function validateCategoryName(name) {
+  const value = String(name ?? "").trim();
+  if (value.length < 2 || value.length > 100) {
+    return "Nama kategori harus 2–100 karakter.";
+  }
+  return null;
+}
