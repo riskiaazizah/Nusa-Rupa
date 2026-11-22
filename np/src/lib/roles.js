@@ -4,5 +4,11 @@ export function homePathFor(user) {
   if (user.role === "curator") {
     return user.curator_status === "approved" ? "/curator" : "/pending-curator";
   }
-  return "/"; // member
+  return "/"; // member: Homepage (PRD AUTH-05)
+}
+
+// Tujuan tombol "Dashboard" di navbar
+export function dashboardPathFor(user) {
+  if (user.role === "member") return "/member/artworks";
+  return homePathFor(user);
 }

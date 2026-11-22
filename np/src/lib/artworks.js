@@ -28,7 +28,7 @@ export async function createArtwork({ userId, categoryId, title, description, fi
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    const rows = await client.query(
+    const { rows } = await client.query(
       `INSERT INTO artworks (user_id, category_id, title, description, file_url)
        VALUES ($1, $2, $3, $4, $5) RETURNING id`,
       [userId, categoryId, title, description, fileUrl]

@@ -5,7 +5,7 @@ import { pool, query } from "./db";
 const DUMMY_HASH = "$2b$10$U.iSyxBzXLIKGvcMVio9Ge5wDpIJwLz7SZiz065/6OGA2YIlXFsEy";
 
 export async function findUserByEmail(email) {
-  const { rows } = await query(
+  const rows = await query(
     `SELECT u.id, u.email, u.password_hash, u.role, u.curator_status, p.display_name
        FROM users u
        JOIN profiles p ON p.user_id = u.id

@@ -31,10 +31,10 @@ export const getSession = cache(async () => {
   const session = await verifySession(token);
   if (!session) return null;
 
-  const { rows } = await query(
+  const rows = await query(
     `SELECT u.id, u.email, u.role, u.curator_status, p.display_name, p.avatar_url
        FROM users u
-       JOIN profiles p ON p.user_id = u.id
+       LEFT JOIN profiles p ON p.user_id = u.id
       WHERE u.id = $1`,
     [session.id]
   );
@@ -45,18 +45,21 @@ export const getSession = cache(async () => {
 export async function requireRole(role) {
   const user = await getSession();
   if (!user) redirect("/login");
-  if (user.role !== role) redirect("/");
+  if (user.role?.toLowerCase() !== role) redirect("/");
   if (role === "curator" && user.curator_status !== "approved") {
     redirect("/pending-curator");
   }
   return user;
 }
 
+
 // Khusus Pending Curator Page: curator yang belum approved
 export async function requirePendingCurator() {
   const user = await getSession();
   if (!user) redirect("/login");
-  if (user.role !== "curator") redirect("/");
-  if (user.curator_status === "approved") redirect("/curator");
+  if (user.role?.toLowerCase() !== "curator") redirect("/");
+  if (user.curator_status === "approved") {
+      redirect("/curator");
+    }
   return user;
 }
