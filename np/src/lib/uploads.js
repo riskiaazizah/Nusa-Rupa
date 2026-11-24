@@ -1,14 +1,35 @@
 import { randomUUID } from "node:crypto";
-import { mkdir, writeFile, unlink } from "node:fs/promises";
+import { mkdir, writeFile, unlink, access } from "node:fs/promises";
+import { constants } from "node:fs";
 import path from "node:path";
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // 5 MB
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "artworks");
-const URL_PREFIX = "/uploads/artworks/";
+const UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads");
+const FOLDERS = ["artworks", "banners", "avatars"];
+const OWN_FILE = /^\/uploads\/(artworks|banners|avatars)\/([a-zA-Z0-9_-]+\.(?:jpg|jpeg|png|webp|gif|svg))$/;
 
-// Mengenali tipe gambar dari isi file (magic bytes), bukan dari nama/ekstensi
-// yang bisa dipalsukan. Mengembalikan { ext, mime } atau null.
+export function toFileSlug(str, defaultName = "upload") {
+  if (!str || typeof str !== "string") return defaultName;
+  const slug = str
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+  return slug || defaultName;
+}
+
+async function fileExists(filePath) {
+  try {
+    await access(filePath, constants.F_OK);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function detectImageType(buf) {
   if (buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) {
     return { ext: "jpg", mime: "image/jpeg" };
@@ -30,21 +51,30 @@ export function detectImageType(buf) {
   return null;
 }
 
-// Nama file dibuat acak (UUID); nama asli dari user tidak dipakai sama sekali.
-export async function saveUpload(buffer, ext) {
-  await mkdir(UPLOAD_DIR, { recursive: true });
-  const name = `${randomUUID()}.${ext}`;
-  await writeFile(path.join(UPLOAD_DIR, name), buffer);
-  return `${URL_PREFIX}${name}`;
+export async function saveUpload(buffer, ext, folder = "artworks", baseName = null) {
+  if (!FOLDERS.includes(folder)) throw new Error("Folder upload tidak valid.");
+  const dir = path.join(UPLOAD_ROOT, folder);
+  await mkdir(dir, { recursive: true });
+
+  const safeExt = ext.replace(/^\.+/, "").toLowerCase();
+  const slug = baseName ? toFileSlug(baseName, folder) : randomUUID();
+
+  let name = `${slug}.${safeExt}`;
+  let counter = 1;
+  while (await fileExists(path.join(dir, name))) {
+    name = `${slug}-${counter}.${safeExt}`;
+    counter++;
+  }
+
+  await writeFile(path.join(dir, name), buffer);
+  return `/uploads/${folder}/${name}`;
 }
 
-// Hanya boleh menghapus file di /uploads/artworks/. File seed dan path lain diabaikan.
 export async function removeUploadedFile(fileUrl) {
-  if (typeof fileUrl !== "string" || !fileUrl.startsWith(URL_PREFIX)) return;
-  const name = fileUrl.slice(URL_PREFIX.length);
-  if (name !== path.basename(name)) return; // tolak "../" dan sub-folder
+  const match = typeof fileUrl === "string" ? OWN_FILE.exec(fileUrl) : null;
+  if (!match) return;
   try {
-    await unlink(path.join(UPLOAD_DIR, name));
+    await unlink(path.join(UPLOAD_ROOT, match[1], match[2]));
   } catch (err) {
     if (err.code !== "ENOENT") console.error(err);
   }
