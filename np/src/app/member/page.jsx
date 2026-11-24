@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Sementara diarahkan ke Karya Saya. Nanti diganti ke /member/profile.
+// Dashboard Member dibuka di Profile Management (sesuai spesifikasi)
 export default function MemberIndexPage() {
-  redirect("/member/artworks");
+  redirect("/member/profile");
 }
