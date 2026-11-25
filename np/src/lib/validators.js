@@ -38,6 +38,34 @@ export function validateLogin(input = {}) {
   return { ok: Object.keys(errors).length === 0, errors, data: { email, password } };
 }
 
+export function validateForgotPassword(input = {}) {
+  const errors = {};
+  const email = String(input.email ?? "").trim().toLowerCase();
+
+  if (!EMAIL_RE.test(email) || email.length > 255) {
+    errors.email = "Format email tidak valid.";
+  }
+
+  return { ok: Object.keys(errors).length === 0, errors, data: { email } };
+}
+
+export function validateResetPassword(input = {}) {
+  const errors = {};
+  const password = String(input.password ?? "");
+  const confirmPassword = String(input.confirmPassword ?? "");
+
+  if (password.length < 8 || password.length > 72) {
+    errors.password = "Password baru harus 8–72 karakter.";
+  }
+  if (!confirmPassword) {
+    errors.confirmPassword = "Konfirmasi password wajib diisi.";
+  } else if (password !== confirmPassword) {
+    errors.confirmPassword = "Konfirmasi password tidak cocok.";
+  }
+
+  return { ok: Object.keys(errors).length === 0, errors, data: { password } };
+}
+
 
 // Nama kategori: wajib, 2–100 karakter. Keunikan dijaga database (unique index LOWER(name)).
 export function validateCategoryName(name) {

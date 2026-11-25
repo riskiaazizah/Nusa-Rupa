@@ -36,58 +36,72 @@ export default function LoginForm() {
       router.push(data.redirectTo);
       router.refresh();
     } catch {
-      setFormError("Tidak dapat terhubung ke server. Coba lagi.");
+      setFormError("Unable to reach server. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-deep-forest">Masuk ke TIGA</h1>
-        <p className="mt-1 text-sm text-deep-forest/70">
+        <h1 className="font-display text-3xl font-semibold text-ink">Log in to TIGA</h1>
+        <p className="mt-1.5 text-sm text-mute">
           When nature loses its voice, let art speak.
         </p>
       </div>
 
       {formError && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-people/20 bg-people/5 p-4 text-sm font-medium text-people">
           {formError}
-        </p>
+        </div>
       )}
 
-      <FormField
-        label="Email"
-        name="email"
-        type="email"
-        value={values.email}
-        onChange={handleChange}
-        error={errors.email}
-        autoComplete="email"
-      />
-      <FormField
-        label="Password"
-        name="password"
-        type="password"
-        value={values.password}
-        onChange={handleChange}
-        error={errors.password}
-        autoComplete="current-password"
-      />
+      <div className="space-y-4">
+        <FormField
+          label="Email"
+          name="email"
+          type="email"
+          value={values.email}
+          onChange={handleChange}
+          error={errors.email}
+          autoComplete="email"
+          placeholder="your@email.com"
+          required
+        />
+        <FormField
+          label="Password"
+          name="password"
+          type="password"
+          value={values.password}
+          onChange={handleChange}
+          error={errors.password}
+          autoComplete="current-password"
+          placeholder="••••••••"
+          required
+          extraLabel={
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-mute hover:text-people hover:underline transition"
+            >
+              Forgot password?
+            </Link>
+          }
+        />
+      </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-forest px-4 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-people disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {loading ? "Memproses..." : "Masuk"}
+        {loading ? "Logging in..." : "Log in"}
       </button>
 
-      <p className="text-center text-sm text-deep-forest/80">
-        Belum punya akun?{" "}
-        <Link href="/register" className="font-semibold text-forest hover:underline">
-          Daftar
+      <p className="text-center text-sm text-mute">
+        New here?{" "}
+        <Link href="/register" className="font-semibold text-ink hover:text-people hover:underline">
+          Sign up
         </Link>
       </p>
     </form>

@@ -57,3 +57,10 @@ export async function createUser({ role, displayName, email, password }) {
     client.release();
   }
 }
+
+// Reset password pengguna berdasarkan userId
+export async function resetUserPassword(userId, newPassword) {
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  await query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, userId]);
+  return true;
+}

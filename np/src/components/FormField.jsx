@@ -11,6 +11,9 @@ export default function FormField({
   error,
   hint,
   autoComplete,
+  placeholder,
+  required,
+  extraLabel,
 }) {
   const id = useId();
   const errorId = `${id}-error`;
@@ -19,9 +22,15 @@ export default function FormField({
 
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-deep-forest">
-        {label}
-      </label>
+      {label && (
+        <div className="mb-1.5 flex items-center justify-between gap-2">
+          <label htmlFor={id} className="block text-xs font-semibold uppercase tracking-wider text-mute">
+            {label}
+            {required && <span className="ml-1 text-people">*</span>}
+          </label>
+          {extraLabel}
+        </div>
+      )}
       <div className="relative">
         <input
           id={id}
@@ -30,25 +39,27 @@ export default function FormField({
           value={value}
           onChange={onChange}
           autoComplete={autoComplete}
+          placeholder={placeholder}
+          required={required}
           aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? errorId : undefined}
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-deep-forest outline-none transition focus:ring-2 focus:ring-forest ${
-            error ? "border-red-600" : "border-deep-forest/25"
-          } ${isPassword ? "pr-28" : ""}`}
+          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-mute/50 focus:border-ink focus:ring-1 focus:ring-ink ${
+            error ? "border-people ring-1 ring-people/30" : "border-line hover:border-ink/40"
+          } ${isPassword ? "pr-20" : ""}`}
         />
         {isPassword && (
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="absolute inset-y-0 right-3 text-xs font-medium text-forest hover:underline"
+            className="absolute inset-y-0 right-3 text-xs font-medium text-mute hover:text-ink"
           >
-            {show ? "Sembunyikan" : "Tampilkan"}
+            {show ? "Hide" : "Show"}
           </button>
         )}
       </div>
-      {hint && !error && <p className="mt-1 text-xs text-deep-forest/70">{hint}</p>}
+      {hint && !error && <p className="mt-1 text-xs text-mute">{hint}</p>}
       {error && (
-        <p id={errorId} role="alert" className="mt-1 text-xs font-medium text-red-700">
+        <p id={errorId} role="alert" className="mt-1.5 text-xs font-medium text-people">
           {error}
         </p>
       )}

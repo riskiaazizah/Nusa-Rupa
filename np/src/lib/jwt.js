@@ -30,3 +30,23 @@ export async function verifySession(token) {
     return null; // token rusak / kedaluwarsa
   }
 }
+
+// Token reset password bertenggat waktu singkat (15 menit)
+export async function signPasswordResetToken({ id, email }) {
+  return new SignJWT({ email, type: "password_reset" })
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(String(id))
+    .setIssuedAt()
+    .setExpirationTime("15m")
+    .sign(getSecret());
+}
+
+export async function verifyPasswordResetToken(token) {
+  try {
+    const { payload } = await jwtVerify(token, getSecret());
+    if (payload.type !== "password_reset") return null;
+    return { id: Number(payload.sub), email: payload.email };
+  } catch {
+    return null;
+  }
+}
