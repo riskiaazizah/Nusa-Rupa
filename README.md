@@ -127,7 +127,7 @@ Buat file `.env.local` pada direktori root proyek (`np/`):
 DATABASE_URL=postgresql://postgres:password@localhost:5432/tiga_db
 
 # Kunci Rahasia Sesi JWT (Minimal 32 Karakter)
-SESSION_SECRET=kunci_rahasia_super_aman_tiga_art_for_earth_2026
+JWT_SECRET=kunci_rahasia_super_aman_tiga_art_for_earth_2026
 
 # Lingkungan Aplikasi
 NODE_ENV=development
