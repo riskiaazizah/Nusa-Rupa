@@ -38,7 +38,7 @@ export default function CommentForm({ artworkId }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-xl bg-forest px-5 py-2 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:opacity-60"
+        className="rounded-full bg-forest px-6 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60 shadow-sm"
       >
         {pending ? "Mengirim..." : "Kirim"}
       </button>

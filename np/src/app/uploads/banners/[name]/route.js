@@ -5,11 +5,13 @@ import { NextResponse } from "next/server";
 // Menyajikan banner challenge yang diunggah SETELAH build (lihat uploads/artworks/[name]).
 const TYPES = {
   jpg: "image/jpeg",
+  jpeg: "image/jpeg",
   png: "image/png",
   webp: "image/webp",
   gif: "image/gif",
+  svg: "image/svg+xml",
 };
-const NAME_RE = /^[0-9a-f-]{36}\.(jpg|png|webp|gif)$/; // hanya nama UUID buatan sistem
+const NAME_RE = /^[a-zA-Z0-9_-]+\.(jpg|jpeg|png|webp|gif|svg)$/;
 
 export async function GET(request, { params }) {
   const { name } = await params;

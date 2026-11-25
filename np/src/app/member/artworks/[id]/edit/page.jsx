@@ -4,7 +4,7 @@ import { getOwnedArtwork } from "@/lib/artworks";
 import { listCategories } from "@/lib/categories";
 import EditArtworkForm from "@/components/member/EditArtworkForm";
 
-export const metadata = { title: "Edit Karya" };
+export const metadata = { title: "Edit Artwork · TIGA" };
 
 export default async function EditArtworkPage({ params }) {
   const user = await requireRole("member");
@@ -14,7 +14,7 @@ export default async function EditArtworkPage({ params }) {
   if (!Number.isInteger(artworkId)) notFound();
 
   const [artwork, categories] = await Promise.all([
-    getOwnedArtwork(artworkId, user.id), // hanya karya milik sendiri
+    getOwnedArtwork(artworkId, user.id),
     listCategories(),
   ]);
   if (!artwork) notFound();
@@ -22,9 +22,9 @@ export default async function EditArtworkPage({ params }) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-deep-forest">Edit Karya</h1>
-        <p className="mt-1 text-sm text-deep-forest/70">
-          Judul, deskripsi, kategori, dan tags dapat diubah.
+        <h1 className="font-display text-3xl font-semibold text-ink">Edit Artwork</h1>
+        <p className="mt-1 text-sm text-mute">
+          Title, description, category, and issue tags can be modified.
         </p>
       </div>
       <EditArtworkForm artwork={artwork} categories={categories} />

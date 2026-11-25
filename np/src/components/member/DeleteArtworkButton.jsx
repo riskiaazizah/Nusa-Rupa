@@ -12,35 +12,35 @@ export default function DeleteArtworkButton({ id }) {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="text-red-700 hover:underline"
+        className="text-xs font-semibold text-people hover:underline"
       >
-        Hapus
+        Delete
       </button>
     );
   }
 
   return (
-    <form action={formAction} className="space-y-2">
+    <form action={formAction} className="space-y-2 rounded-xl border border-people/20 bg-people/5 p-3">
       <input type="hidden" name="id" value={id} />
-      <p className="text-xs font-medium text-red-700">Hapus karya ini secara permanen?</p>
-      <div className="flex gap-2">
+      <p className="text-xs font-medium text-people">Permanently delete this artwork?</p>
+      <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+          className="rounded-full bg-people px-3 py-1 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
         >
-          {pending ? "Menghapus..." : "Ya, hapus"}
+          {pending ? "Deleting..." : "Yes, delete"}
         </button>
         <button
           type="button"
           onClick={() => setConfirming(false)}
-          className="rounded-lg border border-deep-forest/25 px-3 py-1.5 text-xs font-semibold text-deep-forest hover:bg-ivory"
+          className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-ink transition hover:bg-soft"
         >
-          Batal
+          Cancel
         </button>
       </div>
       {state.error && (
-        <p role="alert" className="text-xs font-medium text-red-700">
+        <p role="alert" className="text-xs font-medium text-people">
           {state.error}
         </p>
       )}

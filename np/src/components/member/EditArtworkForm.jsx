@@ -19,46 +19,50 @@ export default function EditArtworkForm({ artwork, categories }) {
   }
 
   return (
-    <form action={formAction} noValidate className="max-w-2xl space-y-5">
+    <form action={formAction} noValidate className="max-w-2xl space-y-6">
       <input type="hidden" name="id" value={artwork.id} />
 
       {state.error && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-people/20 bg-people/5 p-4 text-sm font-medium text-people">
           {state.error}
-        </p>
+        </div>
       )}
 
-      <div>
-        <p className="mb-1.5 text-sm font-medium text-deep-forest">File karya</p>
-        <div className="overflow-hidden rounded-xl border border-deep-forest/10 bg-white">
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-mute">
+          Artwork Image File
+        </span>
+        <div className="overflow-hidden rounded-xl border border-ink/10 bg-soft">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={artwork.file_url} alt={artwork.title} className="max-h-72 w-full object-contain" />
+          <img src={artwork.file_url} alt={artwork.title} className="max-h-80 w-full object-contain" />
         </div>
-        <p className="mt-1 text-xs text-deep-forest/70">
-          File tidak dapat diganti. Untuk mengganti file, hapus karya ini lalu unggah ulang.
+        <p className="mt-2 text-xs text-mute">
+          File cannot be replaced after upload. To change the file, delete this artwork and upload anew.
         </p>
       </div>
 
-      <ArtworkFields
-        values={values}
-        errors={state.errors ?? {}}
-        onChange={handleChange}
-        categories={categories}
-      />
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <ArtworkFields
+          values={values}
+          errors={state.errors ?? {}}
+          onChange={handleChange}
+          categories={categories}
+        />
+      </div>
 
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={pending}
-          className="rounded-xl bg-forest px-6 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-forest px-7 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {pending ? "Menyimpan..." : "Simpan Perubahan"}
+          {pending ? "Saving..." : "Save Changes"}
         </button>
         <Link
           href="/member/artworks"
-          className="rounded-xl border border-deep-forest/25 px-6 py-2.5 text-sm font-semibold text-deep-forest transition hover:bg-white"
+          className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink hover:bg-soft"
         >
-          Batal
+          Cancel
         </Link>
       </div>
     </form>

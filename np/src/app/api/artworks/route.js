@@ -45,7 +45,7 @@ export async function POST(request) {
     return NextResponse.json({ errors }, { status: 400 });
   }
 
-  const fileUrl = await saveUpload(buffer, type.ext);
+  const fileUrl = await saveUpload(buffer, type.ext, "artworks", data.title);
   try {
     const artwork = await createArtwork({ userId: user.id, fileUrl, ...data });
     return NextResponse.json({ ok: true, id: artwork.id }, { status: 201 });

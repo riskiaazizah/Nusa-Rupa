@@ -11,7 +11,7 @@ export default function DeleteAccountForm() {
       <button
         type="button"
         onClick={() => setConfirming(true)}
-        className="w-full rounded-xl border border-red-700 px-4 py-2.5 text-sm font-semibold text-red-700 transition hover:bg-red-50"
+        className="w-full rounded-full border border-people px-6 py-2.5 text-sm font-semibold text-people transition hover:bg-people hover:text-white"
       >
         Delete Account
       </button>
@@ -19,23 +19,23 @@ export default function DeleteAccountForm() {
   }
 
   return (
-    <form action={deleteRejectedAccount} className="space-y-3">
-      <p role="alert" className="text-sm font-medium text-red-700">
-        Akun akan dihapus permanen dan tidak dapat dikembalikan. Lanjutkan?
+    <form action={deleteRejectedAccount} className="space-y-3 rounded-xl border border-people/30 bg-people/5 p-4">
+      <p role="alert" className="text-xs font-medium text-people">
+        This account will be permanently deleted and cannot be recovered. Continue?
       </p>
       <div className="flex gap-3">
         <button
           type="submit"
-          className="flex-1 rounded-xl bg-red-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-800"
+          className="flex-1 rounded-full bg-people px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90"
         >
-          Ya, hapus akun
+          Yes, delete account
         </button>
         <button
           type="button"
           onClick={() => setConfirming(false)}
-          className="flex-1 rounded-xl border border-deep-forest/25 px-4 py-2.5 text-sm font-semibold text-deep-forest transition hover:bg-ivory"
+          className="flex-1 rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-ink transition hover:bg-soft"
         >
-          Batal
+          Cancel
         </button>
       </div>
     </form>

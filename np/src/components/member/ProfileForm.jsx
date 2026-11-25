@@ -118,7 +118,7 @@ export default function ProfileForm({ profile }) {
           ) : (
             <div
               aria-hidden="true"
-              className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-forest text-3xl font-bold text-ivory"
+              className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-forest text-3xl font-bold text-white shadow-xs"
             >
               {(displayName || "?").charAt(0).toUpperCase()}
             </div>
@@ -131,7 +131,7 @@ export default function ProfileForm({ profile }) {
               onChange={handleFile}
               aria-label="Pilih foto profil"
               aria-invalid={errors.avatar ? "true" : "false"}
-              className="block text-sm text-deep-forest file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-forest file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-ivory hover:file:bg-deep-forest"
+              className="block text-sm text-ink file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-forest file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:opacity-90 transition"
             />
             {profile.avatarUrl && !file && (
               <label className="flex items-center gap-2 text-sm text-deep-forest">
@@ -169,9 +169,8 @@ export default function ProfileForm({ profile }) {
           value={bio}
           onChange={(e) => setBio(e.target.value)}
           aria-invalid={errors.bio ? "true" : "false"}
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-deep-forest outline-none focus:ring-2 focus:ring-forest ${
-            errors.bio ? "border-red-600" : "border-deep-forest/25"
-          }`}
+          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-deep-forest outline-none focus:ring-2 focus:ring-forest ${errors.bio ? "border-red-600" : "border-deep-forest/25"
+            }`}
         />
         <p className="mt-1 text-xs text-deep-forest/70">{bio.length}/500 karakter</p>
         {errors.bio && <p role="alert" className="mt-1 text-xs font-medium text-red-700">{errors.bio}</p>}
@@ -221,7 +220,7 @@ export default function ProfileForm({ profile }) {
           <button
             type="button"
             onClick={() => setLinks((rows) => [...rows, { label: "", url: "" }])}
-            className="rounded-xl border border-forest px-4 py-2 text-sm font-semibold text-forest transition hover:bg-ivory"
+            className="rounded-xl border border-forest px-4 py-2 text-sm font-semibold text-forest transition hover:bg-forest/10"
           >
             + Tambah tautan
           </button>
@@ -232,7 +231,7 @@ export default function ProfileForm({ profile }) {
       <button
         type="submit"
         disabled={loading}
-        className="rounded-xl bg-forest px-6 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+        className="rounded-full bg-forest px-7 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 shadow-sm"
       >
         {loading ? "Menyimpan..." : "Simpan Profil"}
       </button>
