@@ -49,26 +49,26 @@ INSERT INTO tags (name) VALUES
  ('reforestation'),
  ('sustainable living');
 
--- ARTWORKS (tersedia di public/uploads/artworks/)
+-- ARTWORKS (gambar placeholder ada di public/uploads/seed/)
 INSERT INTO artworks (id, user_id, category_id, title, description, file_url, created_at) VALUES
- (1, 2, 2, 'Mata Terakhir di Hutan Kalimantan',
+ (1, 2, 2, 'The Last Gaze in The Borneo Forest',
   'Ilustrasi orangutan yang menatap hamparan sawit di tepi hutan yang menyusut.',
-  '/uploads/artworks/gambar-1.png', NOW() - INTERVAL '10 days'),
- (2, 3, 4, 'Asap di Atas Gambut',
+  'public\uploads\artworks\the-last-gaze-in-borneo-forest.jpg', NOW() - INTERVAL '10 days'),
+ (2, 3, 4, 'Smoke Over the Peatlands',
   'Dokumentasi digital kabut asap yang menutup lahan gambut setelah kebakaran.',
-  '/uploads/artworks/gambar-2.png', NOW() - INTERVAL '9 days'),
- (3, 2, 1, 'Anggrek Hutan Hujan',
+  'public\uploads\artworks\smoke-over-the-peatlands.jpg', NOW() - INTERVAL '9 days'),
+ (3, 2, 1, 'Orchid of the Rainforest',
   'Studi botani anggrek endemik yang habitatnya terus berkurang.',
-  '/uploads/artworks/gambar-3.png', NOW() - INTERVAL '7 days'),
- (4, 4, 3, 'Suara dari Hutan Adat',
+  'public\uploads\artworks\orchid-of-the-rainforest.jpg', NOW() - INTERVAL '7 days'),
+ (4, 4, 3, 'Voices from the Customary Forest',
   'Potret komunitas adat yang mempertahankan hutan sebagai ruang hidup.',
-  '/uploads/artworks/gambar-4.png', NOW() - INTERVAL '5 days'),
- (5, 4, 5, 'Tenun dan Tanah',
-  'Motif tenun yang terinspirasi pengetahuan lokal tentang tanah dan tanaman.',
-  '/uploads/artworks/gambar-5.png', NOW() - INTERVAL '3 days'),
- (6, 3, 6, 'Menanam Kembali Mangrove',
-  'Warga pesisir menanam bibit mangrove untuk memulihkan garis pantai.',
-  '/uploads/artworks/gambar-6.png', NOW() - INTERVAL '1 days');
+  'public\uploads\artworks\voices-from-the-customary-forest.jpg', NOW() - INTERVAL '5 days'),
+ (5, 4, 5, 'The Bird That Could Not Return',
+  'Sepasang burung rangkong yang bertengger di dahan tersisa, kehilangan jalur pulang ke sarang mereka akibat hutan yang terbakar.',
+  'public\uploads\artworks\the-bird.jpg', NOW() - INTERVAL '3 days'),
+ (6, 3, 6, 'The Hands That Fight the Fire',
+  'Potret petugas pemadam kebakaran yang berjibaku memadamkan kobaran api di garis depan lahan gambut.',
+  'public\uploads\artworks\the-hands-that-figth-the-fire.jpg', NOW() - INTERVAL '1 days');
 
 -- TAGS PER KARYA (mengambil id tag berdasarkan nama)
 INSERT INTO artwork_tags (artwork_id, tag_id)
@@ -78,7 +78,7 @@ SELECT a.artwork_id, t.id FROM (VALUES
  (3,'endangered species'), (3,'habitat loss'),
  (4,'indigenous rights'),  (4,'palm oil expansion'),
  (5,'indigenous rights'),  (5,'sustainable living'),
- (6,'reforestation'),      (6,'climate change')
+ (6,'reforestation'), (6, 'peatland'), (6,'climate change')
 ) AS a(artwork_id, tag_name)
 JOIN tags t ON t.name = a.tag_name;
 
@@ -102,21 +102,19 @@ INSERT INTO reports (artwork_id, reporter_id, reason, details) VALUES
 -- CHALLENGES (tanggal relatif ke NOW() agar demo selalu valid)
 -- 1 = aktif | 2 = sudah berakhir (untuk demo Select Winners) | 3 = belum dimulai
 INSERT INTO challenges (id, curator_id, title, description, rules, prize, start_date, end_date, banner_url) VALUES
- (1, 5, 'Suara Hutan Kalimantan',
+ (1, 5, 'Voices of the Borneo Forest',
   'Ciptakan karya yang menyuarakan hutan Kalimantan dan satwa di dalamnya.',
   'Karya orisinal. Satu karya per peserta. Tema: hutan, satwa, dan dampak sosial.',
   'Rp 2.000.000 + sertifikat',
-  NOW() - INTERVAL '5 days', NOW() + INTERVAL '14 days', '/uploads/seed/banner-1.svg'),
- (2, 5, 'Gambut Menyala',
+  NOW() - INTERVAL '5 days', NOW() + INTERVAL '14 days', 'public\uploads\seed\challenge-1.jpg'),
+ (2, 5, 'Peatlands Ablaze',
   'Visualisasikan dampak kebakaran lahan gambut bagi iklim dan masyarakat.',
   'Karya orisinal. Satu karya per peserta.',
   'Rp 1.500.000 + merchandise',
-  NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days', '/uploads/seed/banner-2.svg'),
- (3, 5, 'Pulihkan Pesisir',
-  'Tunjukkan harapan lewat restorasi mangrove dan ekosistem pesisir.',
-  'Karya orisinal. Satu karya per peserta.',
-  'Paket workshop konservasi',
-  NOW() + INTERVAL '7 days', NOW() + INTERVAL '30 days', '/uploads/seed/banner-3.svg');
+  NOW() - INTERVAL '30 days', NOW() - INTERVAL '2 days', 'public\uploads\seed\challenge-2.jpg'),
+ (3, 5, 'Roots After the Fire',
+  'Visualisasikan harapan melalui kisah pemulihan lahan gambut, tumbuhnya kembali tunas kehidupan di tanah bekas terbakar, dan ketangguhan alam pasca-karhutla.', 'Karya orisinal. Satu karya per peserta.', 'Paket workshop konservasi',
+  NOW() + INTERVAL '7 days', NOW() + INTERVAL '30 days', 'public\uploads\seed\challenge-3.jpg');
 
 -- SUBMISSIONS (challenge 2 sengaja tanpa pemenang agar bisa didemokan)
 INSERT INTO submissions (challenge_id, artwork_id, user_id, rank) VALUES
@@ -129,3 +127,15 @@ SELECT setval(pg_get_serial_sequence('users','id'),      (SELECT MAX(id) FROM us
 SELECT setval(pg_get_serial_sequence('categories','id'), (SELECT MAX(id) FROM categories));
 SELECT setval(pg_get_serial_sequence('artworks','id'),   (SELECT MAX(id) FROM artworks));
 SELECT setval(pg_get_serial_sequence('challenges','id'), (SELECT MAX(id) FROM challenges));
+
+-- Perbaiki path gambar di tabel artworks
+UPDATE artworks
+SET file_url = REPLACE(REPLACE(file_url, 'public\', '/'), '\', '/')
+WHERE file_url LIKE 'public%';
+
+-- Perbaiki path banner di tabel challenges
+UPDATE challenges
+SET banner_url = REPLACE(REPLACE(banner_url, 'public\', '/'), '\', '/')
+WHERE banner_url LIKE 'public%';
+
+
