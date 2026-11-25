@@ -48,3 +48,8 @@ next-env.d.ts
 /public/uploads/banners/
 
 /public/uploads/avatars/
+
+# agent & design specs
+AGENTS.md
+DESIGN.md
+
