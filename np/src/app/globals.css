@@ -1,16 +1,113 @@
 @import "tailwindcss";
 
-/* Palet TIGA · Art for Earth. Pakai: bg-forest, text-deep-forest, bg-sage, bg-ivory, text-earth */
+/* TIGA · Art for Earth (UI Blueprint v2) */
 @theme {
-  --color-deep-forest: #172c23;
-  --color-forest: #3e6448;
-  --color-sage: #a9be8b;
-  --color-ivory: #e9e8d9;
-  --color-earth: #c56e4a;
-  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --color-white: #ffffff;
+  --color-ink: #0f0f0f;
+  --color-forest: #1f6b45;
+  --color-animals: #2f3fa8;
+  --color-people: #d92e1c;
+  --color-soft: #f5f5f3;
+  --color-mute: #6a6a6a;
+  --color-line: #e2e2e2;
+  --color-cream: #fff1dc;
+
+  /* Tints for dark media backgrounds */
+  --color-tint-forest: #8fe3ae;
+  --color-tint-animals: #a8b8ff;
+  --color-tint-people: #ff8466;
+
+  --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-montserrat), Montserrat, ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
-  background: var(--color-ivory);
-  color: var(--color-deep-forest);
+  background-color: var(--color-white);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Hairline borders */
+.border-hairline {
+  border-width: 1px;
+  border-color: var(--color-line);
+}
+
+.border-ink-hairline {
+  border-width: 1px;
+  border-color: var(--color-ink);
+}
+
+/* Duotone image filter */
+.duotone-filter {
+  filter: grayscale(1) contrast(1.15);
+  mix-blend-mode: multiply;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
+
+/* Hairline borders */
+.border-hairline {
+  border-width: 1px;
+  border-color: var(--color-line);
+}
+
+.border-ink-hairline {
+  border-width: 1px;
+  border-color: var(--color-ink);
+}
+
+/* Duotone image filter */
+.duotone-filter {
+  filter: grayscale(1) contrast(1.15);
+  mix-blend-mode: multiply;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

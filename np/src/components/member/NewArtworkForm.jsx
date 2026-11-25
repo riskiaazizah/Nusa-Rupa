@@ -17,7 +17,6 @@ export default function NewArtworkForm({ categories }) {
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Bebaskan memori preview saat diganti atau form ditutup
   useEffect(() => {
     return () => {
       if (preview) URL.revokeObjectURL(preview);
@@ -36,16 +35,15 @@ export default function NewArtworkForm({ categories }) {
       setPreview("");
       return;
     }
-    // Cek awal untuk kenyamanan. Validasi yang menentukan tetap di backend.
     if (!ACCEPTED.includes(picked.type)) {
-      setErrors((prev) => ({ ...prev, file: "Format file harus JPG, PNG, WEBP, atau GIF." }));
+      setErrors((prev) => ({ ...prev, file: "File format must be JPG, PNG, WEBP, or GIF." }));
       e.target.value = "";
       setFile(null);
       setPreview("");
       return;
     }
     if (picked.size > MAX_BYTES) {
-      setErrors((prev) => ({ ...prev, file: "Ukuran file maksimal 5 MB." }));
+      setErrors((prev) => ({ ...prev, file: "Maximum file size is 5 MB." }));
       e.target.value = "";
       setFile(null);
       setPreview("");
@@ -76,23 +74,23 @@ export default function NewArtworkForm({ categories }) {
       router.push("/member/artworks");
       router.refresh();
     } catch {
-      setFormError("Tidak dapat terhubung ke server. Coba lagi.");
+      setFormError("Unable to reach server. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="max-w-2xl space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="max-w-2xl space-y-6">
       {formError && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-people/20 bg-people/5 p-4 text-sm font-medium text-people">
           {formError}
-        </p>
+        </div>
       )}
 
-      <div>
-        <label htmlFor="artwork-file" className="mb-1.5 block text-sm font-medium text-deep-forest">
-          File karya
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <label htmlFor="artwork-file" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mute">
+          Artwork Image File <span className="text-people">*</span>
         </label>
         <input
           id="artwork-file"
@@ -101,41 +99,48 @@ export default function NewArtworkForm({ categories }) {
           onChange={handleFile}
           aria-invalid={errors.file ? "true" : "false"}
           aria-describedby={errors.file ? "artwork-file-error" : "artwork-file-hint"}
-          className="block w-full text-sm text-deep-forest file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-forest file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ivory hover:file:bg-deep-forest"
+          className="block w-full text-sm text-ink file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-forest file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:opacity-90 transition"
         />
         {!errors.file && (
-          <p id="artwork-file-hint" className="mt-1 text-xs text-deep-forest/70">
-            JPG, PNG, WEBP, atau GIF. Maksimal 5 MB. File tidak dapat diganti setelah diunggah.
+          <p id="artwork-file-hint" className="mt-1.5 text-xs text-mute">
+            JPG, PNG, WEBP, or GIF. Max 5 MB. Image ratio 4:5 recommended. File cannot be replaced after upload.
           </p>
         )}
         {errors.file && (
-          <p id="artwork-file-error" role="alert" className="mt-1 text-xs font-medium text-red-700">
+          <p id="artwork-file-error" role="alert" className="mt-1.5 text-xs font-medium text-people">
             {errors.file}
           </p>
         )}
         {preview && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-deep-forest/10 bg-white">
+          <div className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-soft">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Pratinjau karya" className="max-h-72 w-full object-contain" />
+            <img src={preview} alt="Artwork preview" className="max-h-80 w-full object-contain" />
           </div>
         )}
       </div>
 
-      <ArtworkFields values={values} errors={errors} onChange={handleChange} categories={categories} />
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <ArtworkFields
+          values={values}
+          errors={errors}
+          onChange={handleChange}
+          categories={categories}
+        />
+      </div>
 
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-forest px-6 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-forest px-7 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Mengunggah..." : "Unggah Karya"}
+          {loading ? "Publishing..." : "Publish Artwork"}
         </button>
         <Link
           href="/member/artworks"
-          className="rounded-xl border border-deep-forest/25 px-6 py-2.5 text-sm font-semibold text-deep-forest transition hover:bg-white"
+          className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink hover:bg-soft"
         >
-          Batal
+          Cancel
         </Link>
       </div>
     </form>
