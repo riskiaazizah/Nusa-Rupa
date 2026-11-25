@@ -5,23 +5,23 @@ export default function Pagination({ basePath = "/", page, totalPages, params })
   if (totalPages <= 1) return null;
 
   const hrefFor = (target) => `${basePath}${buildQuery(params, { page: target > 1 ? target : null })}`;
-  const linkClass = "rounded-xl border border-deep-forest/25 px-4 py-2 transition hover:bg-white";
-  const disabledClass = "rounded-xl border border-deep-forest/10 px-4 py-2 text-deep-forest/40";
+  const linkClass = "rounded-full border border-line bg-white px-4 py-2 text-xs font-semibold text-ink transition hover:border-ink hover:bg-soft";
+  const disabledClass = "rounded-full border border-line/50 bg-soft px-4 py-2 text-xs font-semibold text-mute/40 cursor-not-allowed";
 
   return (
-    <nav aria-label="Halaman" className="mt-8 flex items-center justify-center gap-3 text-sm font-medium">
+    <nav aria-label="Pagination" className="mt-8 flex items-center justify-center gap-3 text-xs font-medium">
       {page > 1 ? (
-        <Link href={hrefFor(page - 1)} className={linkClass}>Sebelumnya</Link>
+        <Link href={hrefFor(page - 1)} className={linkClass}>Previous</Link>
       ) : (
-        <span className={disabledClass}>Sebelumnya</span>
+        <span className={disabledClass}>Previous</span>
       )}
-      <span className="text-deep-forest/70">
-        Halaman {page} dari {totalPages}
+      <span className="text-mute">
+        Page {page} of {totalPages}
       </span>
       {page < totalPages ? (
-        <Link href={hrefFor(page + 1)} className={linkClass}>Berikutnya</Link>
+        <Link href={hrefFor(page + 1)} className={linkClass}>Next</Link>
       ) : (
-        <span className={disabledClass}>Berikutnya</span>
+        <span className={disabledClass}>Next</span>
       )}
     </nav>
   );

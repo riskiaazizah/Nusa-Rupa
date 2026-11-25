@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import { SESSION_COOKIE, verifySession } from "@/lib/jwt";
 
@@ -8,8 +7,8 @@ import { SESSION_COOKIE, verifySession } from "@/lib/jwt";
 
 const ROLE_BY_PREFIX = {
   "/admin": "admin",
-  "/dashboard/member": "member",
-  "/dashboard/curator": "curator",
+  "/member": "member",
+  "/curator": "curator",
   "/pending-curator": "curator",
 };
 
@@ -34,14 +33,7 @@ export async function proxy(request) {
 
   // Jika belum login atau token tidak valid.
   if (!session) {
-    const loginUrl = new URL("/login", request.url);
-
-    loginUrl.searchParams.set(
-      "next",
-      pathname + request.nextUrl.search
-    );
-
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   // Periksa kecocokan role dengan route.
@@ -57,8 +49,8 @@ export async function proxy(request) {
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/dashboard/member/:path*",
-    "/dashboard/curator/:path*",
+    "/member/:path*",
+    "/curator/:path*",
     "/pending-curator/:path*",
   ],
 };
