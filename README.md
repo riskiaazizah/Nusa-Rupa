@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="public/logo/tiga-logo-red.svg" alt="TIGA Logo" width="220" />
+  <img src="./np/public/logo/tiga-logo-white.svg" alt="TIGA Logo" width="220" />
 
   # TIGA · Art for Earth
   
