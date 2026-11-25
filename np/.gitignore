@@ -44,6 +44,7 @@ next-env.d.ts
 # upload unggahan
 /public/uploads/*
 !/public/uploads/artworks/
+!public/uploads/seed/
 
 /public/uploads/banners/
 
