@@ -18,31 +18,45 @@ export default async function CreatorPage({ params }) {
   const links = creator.links.filter((l) => isSafeHttpUrl(l.url));
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-col gap-4 rounded-2xl border border-deep-forest/10 bg-white p-6 shadow-sm sm:flex-row sm:items-center">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 sm:pt-32 sm:pb-20 space-y-12">
+      {/* Creator Profile Header */}
+      <header className="flex flex-col sm:flex-row items-start sm:items-center gap-6 rounded-2xl border border-line bg-soft/50 p-6 sm:p-10">
         {creator.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={creator.avatar_url} alt="" className="h-20 w-20 rounded-full object-cover" />
+          <img
+            src={creator.avatar_url}
+            alt={creator.display_name}
+            className="h-24 w-24 shrink-0 rounded-full object-cover border border-line"
+          />
         ) : (
           <div
             aria-hidden="true"
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-forest text-3xl font-bold text-ivory"
+            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-ink text-3xl font-display font-bold text-white"
           >
             {creator.display_name.charAt(0).toUpperCase()}
           </div>
         )}
-        <div className="space-y-2">
-          <h1 className="text-2xl font-semibold text-deep-forest">{creator.display_name}</h1>
-          {creator.bio && <p className="max-w-2xl text-sm text-deep-forest/80">{creator.bio}</p>}
+
+        <div className="space-y-3 min-w-0 flex-1">
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-semibold text-ink leading-tight">
+            {creator.display_name}
+          </h1>
+
+          {creator.bio && (
+            <p className="max-w-2xl text-sm leading-relaxed text-mute">
+              {creator.bio}
+            </p>
+          )}
+
           {links.length > 0 && (
-            <ul className="flex flex-wrap gap-3 text-sm font-semibold">
+            <ul className="flex flex-wrap gap-2 pt-1">
               {links.map((l) => (
                 <li key={l.id}>
                   <a
                     href={l.url}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="text-forest hover:underline"
+                    className="inline-block rounded-full border border-line bg-white px-4 py-1.5 text-xs font-medium text-ink hover:border-ink hover:bg-soft transition"
                   >
                     {l.label}
                   </a>
@@ -53,14 +67,21 @@ export default async function CreatorPage({ params }) {
         </div>
       </header>
 
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold text-deep-forest">Karya ({total})</h2>
+      {/* Creator Works Gallery */}
+      <section className="space-y-6">
+        <div className="flex items-baseline justify-between border-b border-line pb-4">
+          <h2 className="font-display text-2xl sm:text-3xl font-semibold text-ink">
+            Works ({total})
+          </h2>
+          <span className="text-xs text-mute">Artist Portfolio</span>
+        </div>
+
         {artworks.length === 0 ? (
-          <p className="rounded-2xl border border-dashed border-deep-forest/25 bg-white px-6 py-10 text-center text-sm text-deep-forest/70">
-            Kreator ini belum mengunggah karya.
-          </p>
+          <div className="rounded-2xl border border-dashed border-line bg-soft/30 px-6 py-14 text-center">
+            <p className="text-sm text-mute">This creator has not published any artworks yet.</p>
+          </div>
         ) : (
-          <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {artworks.map((a) => (
               <li key={a.id}>
                 <ArtworkCard artwork={a} />
