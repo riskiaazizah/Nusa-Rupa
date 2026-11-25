@@ -1,42 +1,41 @@
 import { requirePendingCurator } from "@/lib/session";
 import DeleteAccountForm from "@/components/DeleteAccountForm";
 
-export const metadata = { title: "Status Akun Curator" };
+export const metadata = { title: "Curator Account Status · TIGA" };
 
 export default async function PendingCuratorPage() {
   const user = await requirePendingCurator();
   const rejected = user.curator_status === "rejected";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-deep-forest">
-          {rejected ? "Pendaftaran Anda ditolak" : "Akun Anda sedang ditinjau."}
+        <h1 className="font-display text-3xl font-semibold text-ink">
+          {rejected ? "Your registration was rejected." : "Your account is under review."}
         </h1>
-        <p className="mt-1 text-sm text-deep-forest/70">{user.display_name}</p>
+        <p className="mt-1.5 text-sm text-mute">{user.display_name}</p>
       </div>
 
       {rejected ? (
-        <>
-          <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
-            Admin menolak pendaftaran Curator ini, sehingga dashboard tidak dapat diakses. Anda
-            masih dapat menghapus akun ini.
-          </p>
+        <div className="space-y-4">
+          <div className="rounded-xl border border-people/30 bg-people/5 p-4 text-sm text-ink">
+            Admin has reviewed and rejected this curator registration. The dashboard cannot be
+            accessed. You may delete this account.
+          </div>
           <DeleteAccountForm />
-        </>
+        </div>
       ) : (
-        <p className="rounded-xl bg-sage/30 px-4 py-3 text-sm text-deep-forest">
-          Admin sedang memeriksa pendaftaran Anda. Dashboard Curator dapat dipakai setelah akun
-          disetujui. Silakan cek kembali nanti.
-        </p>
+        <div className="rounded-xl border border-animals/30 bg-animals/5 p-4 text-sm text-ink">
+          We will unlock your dashboard once an Admin approves your application. Please check back later.
+        </div>
       )}
 
       <form action="/api/auth/logout" method="post">
         <button
           type="submit"
-          className="w-full rounded-xl border border-deep-forest/25 px-4 py-2.5 text-sm font-semibold text-deep-forest transition hover:bg-ivory"
+          className="w-full rounded-full border border-line bg-white px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink hover:bg-soft"
         >
-          Keluar
+          Log out
         </button>
       </form>
     </div>

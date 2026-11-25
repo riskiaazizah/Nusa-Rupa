@@ -45,9 +45,12 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-semibold text-ink">Log in to TIGA</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink">Welcome back</h1>
         <p className="mt-1.5 text-sm text-mute">
-          When nature loses its voice, let art speak.
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="font-semibold text-forest hover:underline">
+            Sign up
+          </Link>
         </p>
       </div>
 
@@ -93,17 +96,16 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-ink px-6 py-3 text-sm font-semibold text-white transition hover:bg-people disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm"
       >
         {loading ? "Logging in..." : "Log in"}
       </button>
 
-      <p className="text-center text-sm text-mute">
-        New here?{" "}
-        <Link href="/register" className="font-semibold text-ink hover:text-people hover:underline">
-          Sign up
+      <div className="pt-2 text-center border-t border-line/60">
+        <Link href="/" className="text-xs text-mute hover:text-ink transition">
+          Return to home exhibition
         </Link>
-      </p>
+      </div>
     </form>
   );
 }

@@ -6,8 +6,8 @@ import Link from "next/link";
 import FormField from "./FormField";
 
 const ROLES = [
-  { value: "member", label: "Member", desc: "Unggah dan bagikan karya" },
-  { value: "curator", label: "Curator", desc: "Buat challenge komunitas" },
+  { value: "member", label: "Member", desc: "Upload and share your artworks" },
+  { value: "curator", label: "Curator", desc: "Create community challenges" },
 ];
 
 export default function RegisterForm() {
@@ -48,27 +48,35 @@ export default function RegisterForm() {
       router.push(data.redirectTo);
       router.refresh();
     } catch {
-      setFormError("Tidak dapat terhubung ke server. Coba lagi.");
+      setFormError("Unable to reach server. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-deep-forest">Daftar ke TIGA</h1>
-        <p className="mt-1 text-sm text-deep-forest/70">Pilih peran Anda di platform.</p>
+        <h1 className="font-display text-3xl font-semibold text-ink">Get started</h1>
+        <p className="mt-1.5 text-sm text-mute">
+          Already have an account?{" "}
+          <Link href="/login" className="font-semibold text-forest hover:underline">
+            Log in
+          </Link>
+        </p>
       </div>
 
       {formError && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-people/20 bg-people/5 p-4 text-sm font-medium text-people">
           {formError}
-        </p>
+        </div>
       )}
 
       <div>
-        <div role="radiogroup" aria-label="Tipe akun" className="grid grid-cols-2 gap-3">
+        <span className="mb-2 block text-xs font-semibold uppercase tracking-wider text-mute">
+          Account Role
+        </span>
+        <div role="radiogroup" aria-label="Account role" className="grid grid-cols-2 gap-3">
           {ROLES.map((r) => {
             const active = values.role === r.value;
             return (
@@ -78,74 +86,82 @@ export default function RegisterForm() {
                 role="radio"
                 aria-checked={active}
                 onClick={() => setValues((v) => ({ ...v, role: r.value }))}
-                className={`rounded-xl border px-3 py-3 text-left transition ${
+                className={`rounded-xl border p-3.5 text-left transition cursor-pointer ${
                   active
-                    ? "border-forest bg-forest text-ivory"
-                    : "border-deep-forest/25 bg-white text-deep-forest hover:border-forest"
+                    ? "border-forest bg-forest text-white shadow-sm"
+                    : "border-line bg-white text-ink hover:border-ink/40"
                 }`}
               >
                 <span className="block text-sm font-semibold">{r.label}</span>
-                <span className="block text-xs opacity-80">{r.desc}</span>
+                <span className={`block text-xs mt-0.5 ${active ? "text-white/85" : "text-mute"}`}>
+                  {r.desc}
+                </span>
               </button>
             );
           })}
         </div>
         {errors.role && (
-          <p role="alert" className="mt-1 text-xs font-medium text-red-700">
+          <p role="alert" className="mt-1.5 text-xs font-medium text-people">
             {errors.role}
           </p>
         )}
       </div>
 
       {isCurator && (
-        <p className="rounded-xl bg-sage/30 px-4 py-3 text-xs text-deep-forest">
-          Akun Curator akan ditinjau Admin lebih dulu. Dashboard baru dapat dipakai setelah akun
-          disetujui.
-        </p>
+        <div className="rounded-xl border border-animals/30 bg-animals/5 p-3.5 text-xs text-ink">
+          Curator accounts will be reviewed by an Admin before access is granted to create challenges.
+        </div>
       )}
 
-      <FormField
-        label={isCurator ? "Nama organisasi / komunitas" : "Nama tampilan"}
-        name="displayName"
-        value={values.displayName}
-        onChange={handleChange}
-        error={errors.displayName}
-        autoComplete="name"
-      />
-      <FormField
-        label="Email"
-        name="email"
-        type="email"
-        value={values.email}
-        onChange={handleChange}
-        error={errors.email}
-        autoComplete="email"
-      />
-      <FormField
-        label="Password"
-        name="password"
-        type="password"
-        value={values.password}
-        onChange={handleChange}
-        error={errors.password}
-        hint="Minimal 8 karakter."
-        autoComplete="new-password"
-      />
+      <div className="space-y-4">
+        <FormField
+          label={isCurator ? "Organization / Community Name" : "Display Name"}
+          name="displayName"
+          value={values.displayName}
+          onChange={handleChange}
+          error={errors.displayName}
+          autoComplete="name"
+          placeholder={isCurator ? "e.g. Borneo Art Collective" : "e.g. Sari Mahardika"}
+          required
+        />
+        <FormField
+          label="Email"
+          name="email"
+          type="email"
+          value={values.email}
+          onChange={handleChange}
+          error={errors.email}
+          autoComplete="email"
+          placeholder="your@email.com"
+          required
+        />
+        <FormField
+          label="Password"
+          name="password"
+          type="password"
+          value={values.password}
+          onChange={handleChange}
+          error={errors.password}
+          hint="At least 8 characters."
+          autoComplete="new-password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-forest px-4 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm"
       >
-        {loading ? "Memproses..." : `Daftar sebagai ${isCurator ? "Curator" : "Member"}`}
+        {loading ? "Creating account..." : `Sign up as ${isCurator ? "Curator" : "Member"}`}
       </button>
 
-      <p className="text-center text-sm text-deep-forest/80">
-        Sudah punya akun?{" "}
-        <Link href="/login" className="font-semibold text-forest hover:underline">
-          Masuk
+      <div className="pt-2 text-center border-t border-line/60">
+        <Link href="/" className="text-xs text-mute hover:text-ink transition">
+          Return to home exhibition
         </Link>
-      </p>
+      </div>
     </form>
   );
 }
