@@ -7,7 +7,6 @@ export default function CategoryRow({ category }) {
   const [editing, setEditing] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
-  // Tutup mode edit setelah berhasil menyimpan
   async function handleEdit(prevState, formData) {
     const result = await editCategoryAction(prevState, formData);
     if (result.success) setEditing(false);
@@ -20,90 +19,90 @@ export default function CategoryRow({ category }) {
   const inUse = category.artwork_count > 0;
 
   return (
-    <tr className="border-t border-deep-forest/10">
-      <td className="px-4 py-3 align-top">
+    <tr className="border-t border-line/60 transition hover:bg-soft/40">
+      <td className="px-5 py-3.5 align-top">
         {editing ? (
           <form action={editAction} className="flex flex-col gap-2 sm:flex-row">
             <input type="hidden" name="id" value={category.id} />
             <input
               name="name"
               defaultValue={category.name}
-              aria-label={`Nama baru untuk kategori ${category.name}`}
-              className="w-full rounded-xl border border-deep-forest/25 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-forest"
+              aria-label={`New name for category ${category.name}`}
+              className="w-full rounded-full border border-line bg-white px-3.5 py-1.5 text-xs text-ink outline-none transition focus:border-ink focus:ring-1 focus:ring-ink"
             />
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={editPending}
-                className="rounded-xl bg-forest px-4 py-2 text-sm font-semibold text-ivory hover:bg-deep-forest disabled:opacity-60"
+                className="rounded-full bg-ink px-4 py-1.5 text-xs font-semibold text-white hover:bg-people disabled:opacity-50"
               >
-                Simpan
+                Save
               </button>
               <button
                 type="button"
                 onClick={() => setEditing(false)}
-                className="rounded-xl border border-deep-forest/25 px-4 py-2 text-sm font-semibold hover:bg-ivory"
+                className="rounded-full border border-line bg-white px-3.5 py-1.5 text-xs font-semibold text-ink hover:bg-soft"
               >
-                Batal
+                Cancel
               </button>
             </div>
           </form>
         ) : (
-          <span className="text-sm font-medium text-deep-forest">{category.name}</span>
+          <span className="text-sm font-medium text-ink">{category.name}</span>
         )}
         {editState.error && (
-          <p role="alert" className="mt-1 text-xs font-medium text-red-700">
+          <p role="alert" className="mt-1 text-xs font-medium text-people">
             {editState.error}
           </p>
         )}
       </td>
 
-      <td className="px-4 py-3 align-top text-sm text-deep-forest">{category.artwork_count}</td>
+      <td className="px-5 py-3.5 align-top text-sm text-mute">{category.artwork_count}</td>
 
-      <td className="px-4 py-3 align-top">
+      <td className="px-5 py-3.5 align-top">
         {!editing &&
           (confirming ? (
             <form action={deleteAction} className="space-y-2">
               <input type="hidden" name="id" value={category.id} />
-              <p className="text-xs font-medium text-red-700">Hapus kategori ini?</p>
-              <div className="flex gap-2">
+              <p className="text-xs font-medium text-people">Delete this category?</p>
+              <div className="flex items-center gap-2">
                 <button
                   type="submit"
                   disabled={deletePending}
-                  className="rounded-xl bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800 disabled:opacity-60"
+                  className="rounded-full bg-people px-3 py-1 text-xs font-semibold text-white hover:opacity-90 disabled:opacity-50"
                 >
-                  Ya, hapus
+                  {deletePending ? "Deleting..." : "Yes, delete"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirming(false)}
-                  className="rounded-xl border border-deep-forest/25 px-3 py-1.5 text-xs font-semibold hover:bg-ivory"
+                  className="rounded-full border border-line bg-white px-3 py-1 text-xs font-semibold text-ink hover:bg-soft"
                 >
-                  Batal
+                  Cancel
                 </button>
               </div>
+              {deleteState.error && (
+                <p role="alert" className="text-xs font-medium text-people">
+                  {deleteState.error}
+                </p>
+              )}
             </form>
           ) : (
-            <div className="flex gap-4 text-sm font-semibold">
-              <button type="button" onClick={() => setEditing(true)} className="text-forest hover:underline">
+            <div className="flex items-center gap-4 text-xs font-semibold">
+              <button type="button" onClick={() => setEditing(true)} className="text-ink hover:text-forest hover:underline">
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => setConfirming(true)}
                 disabled={inUse}
-                title={inUse ? "Masih dipakai karya, tidak dapat dihapus" : undefined}
-                className="text-red-700 hover:underline disabled:cursor-not-allowed disabled:text-deep-forest/40 disabled:no-underline"
+                title={inUse ? "Used by artworks, cannot be deleted" : undefined}
+                className="text-people hover:underline disabled:cursor-not-allowed disabled:text-mute/40 disabled:no-underline"
               >
-                Hapus
+                Delete
               </button>
             </div>
           ))}
-        {deleteState.error && (
-          <p role="alert" className="mt-1 text-xs font-medium text-red-700">
-            {deleteState.error}
-          </p>
-        )}
       </td>
     </tr>
   );

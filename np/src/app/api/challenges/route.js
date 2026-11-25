@@ -22,7 +22,7 @@ export async function POST(request) {
   const { errors, data, banner } = await readChallengeForm(form, { bannerRequired: true });
   if (Object.keys(errors).length > 0) return NextResponse.json({ errors }, { status: 400 });
 
-  const bannerUrl = await saveUpload(banner.buffer, banner.type.ext, "banners");
+  const bannerUrl = await saveUpload(banner.buffer, banner.type.ext, "banners", data.title);
   try {
     const challenge = await createChallenge(user.id, data, bannerUrl);
     return NextResponse.json({ ok: true, id: challenge.id }, { status: 201 });

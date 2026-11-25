@@ -6,7 +6,7 @@ import { formatDateTime } from "@/lib/format";
 import ActionButton from "@/components/admin/ActionButton";
 import { dismissReportAction, takeDownAction } from "./actions";
 
-export const metadata = { title: "Moderasi Konten" };
+export const metadata = { title: "Content Moderation · TIGA" };
 
 const REASON_LABEL = Object.fromEntries(REPORT_REASONS.map((r) => [r.value, r.label]));
 
@@ -21,87 +21,87 @@ export default async function ModerationPage() {
   const queue = await listModerationQueue();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-deep-forest">Moderasi Konten</h1>
-        <p className="mt-1 text-sm text-deep-forest/70">
-          {queue.length} karya menunggu ditinjau. <strong>Dismiss Report</strong> menolak laporan (karya tetap tayang),
-          <strong> Take Down</strong> menerima laporan dan menghapus karya.
+        <h1 className="font-display text-3xl font-semibold text-ink">Content Moderation</h1>
+        <p className="mt-1 text-sm text-mute">
+          {queue.length} reported artworks pending review. <strong>Dismiss Report</strong> keeps the artwork online,
+          while <strong>Take Down</strong> removes the artwork permanently.
         </p>
       </div>
 
       {queue.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-deep-forest/25 bg-white px-6 py-12 text-center text-sm text-deep-forest/70">
-          Tidak ada laporan yang menunggu. Semua bersih.
-        </p>
+        <div className="rounded-2xl border border-line bg-white px-6 py-14 text-center shadow-sm">
+          <p className="font-display text-xl font-semibold text-ink">No reports to review. Nice.</p>
+        </div>
       ) : (
-        <ul className="space-y-5">
+        <ul className="space-y-6">
           {queue.map((a) => (
-            <li key={a.id} className="overflow-hidden rounded-2xl border border-deep-forest/10 bg-white shadow-sm">
-              <div className="flex flex-col gap-5 p-5 md:flex-row">
+            <li key={a.id} className="overflow-hidden rounded-2xl border border-line bg-white p-6 shadow-sm transition hover:border-ink/20">
+              <div className="flex flex-col gap-6 md:flex-row">
                 <Link href={`/artworks/${a.id}`} className="block shrink-0 md:w-56">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={a.file_url} alt={a.title} className="aspect-[4/3] w-full rounded-xl object-cover" />
+                  <img src={a.file_url} alt={a.title} className="aspect-[4/5] w-full rounded-xl object-cover" />
                 </Link>
 
-                <div className="min-w-0 flex-1 space-y-3">
+                <div className="min-w-0 flex-1 space-y-3.5">
                   <div>
-                    <h2 className="text-lg font-semibold text-deep-forest">{a.title}</h2>
-                    <p className="text-sm text-deep-forest/70">
-                      oleh{" "}
-                      <Link href={`/creators/${a.creator_id}`} className="font-medium text-forest hover:underline">
+                    <h2 className="font-display text-2xl font-semibold text-ink">{a.title}</h2>
+                    <p className="text-sm text-mute">
+                      by{" "}
+                      <Link href={`/creators/${a.creator_id}`} className="font-medium text-ink hover:text-people hover:underline">
                         {a.creator_name}
                       </Link>
                     </p>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-800">
-                      {a.report_count} laporan
+                    <span className="rounded-full bg-people/10 px-3 py-1 text-xs font-bold text-people">
+                      {a.report_count} reports
                     </span>
                     {reasonSummary(a.reports).map((r) => (
-                      <span key={r.label} className="rounded-full bg-sage/40 px-3 py-1 text-xs font-medium text-deep-forest">
+                      <span key={r.label} className="rounded-full bg-soft px-3 py-1 text-xs font-medium text-mute">
                         {r.label} ({r.total})
                       </span>
                     ))}
                   </div>
 
-                  <details className="rounded-xl border border-deep-forest/10 bg-ivory/60">
-                    <summary className="cursor-pointer px-4 py-2 text-sm font-semibold text-deep-forest">
-                      Lihat detail laporan
+                  <details className="rounded-xl border border-line bg-soft/50">
+                    <summary className="cursor-pointer px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-mute hover:text-ink">
+                      View report details
                     </summary>
-                    <ul className="space-y-2 border-t border-deep-forest/10 px-4 py-3 text-sm text-deep-forest">
+                    <ul className="space-y-2 border-t border-line/60 px-4 py-3 text-xs text-ink">
                       {a.reports.map((r) => (
                         <li key={r.id}>
-                          <span className="font-semibold">{REASON_LABEL[r.reason] ?? r.reason}</span> oleh {r.reporter_name}{" "}
-                          <span className="text-xs text-deep-forest/60">({formatDateTime(r.created_at)})</span>
-                          {r.details && <p className="mt-0.5 text-deep-forest/80">{r.details}</p>}
+                          <span className="font-semibold">{REASON_LABEL[r.reason] ?? r.reason}</span> by {r.reporter_name}{" "}
+                          <span className="text-mute">({formatDateTime(r.created_at)})</span>
+                          {r.details && <p className="mt-1 text-mute">{r.details}</p>}
                         </li>
                       ))}
                     </ul>
                   </details>
 
-                  <div className="flex flex-wrap items-start gap-3">
+                  <div className="flex flex-wrap items-center gap-3 pt-2">
                     <Link
                       href={`/artworks/${a.id}`}
-                      className="rounded-xl border border-deep-forest/25 px-4 py-2 text-sm font-semibold text-deep-forest transition hover:bg-ivory"
+                      className="rounded-full border border-line bg-white px-5 py-2 text-xs font-semibold text-ink transition hover:border-ink hover:bg-soft"
                     >
-                      Lihat karya
+                      View artwork
                     </Link>
                     <ActionButton
                       action={dismissReportAction}
                       fields={{ artworkId: a.id }}
                       label="Dismiss Report"
-                      pendingLabel="Memproses..."
+                      pendingLabel="Dismissing..."
                     />
                     <ActionButton
                       action={takeDownAction}
                       fields={{ artworkId: a.id }}
                       label="Take Down"
-                      pendingLabel="Menghapus..."
+                      pendingLabel="Taking down..."
                       tone="danger"
-                      confirmMessage="Hapus karya ini secara permanen? Like, komentar, dan submisi challenge terkait ikut terhapus."
-                      confirmLabel="Ya, take down"
+                      confirmMessage="Take down and permanently delete this artwork? Associated likes, comments, and challenge submissions will also be deleted."
+                      confirmLabel="Yes, take down"
                     />
                   </div>
                 </div>

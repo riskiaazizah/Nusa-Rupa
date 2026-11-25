@@ -8,18 +8,18 @@ import ActionButton from "@/components/admin/ActionButton";
 import Pagination from "@/components/Pagination";
 import { deleteUserAction } from "./actions";
 
-export const metadata = { title: "Pengguna" };
+export const metadata = { title: "User Management · TIGA" };
 
 const PAGE_SIZE = 20;
 
 const ROLE_FILTERS = [
-  { value: "", label: "Semua" },
+  { value: "", label: "All" },
   { value: "admin", label: "Admin" },
   { value: "member", label: "Member" },
   { value: "curator", label: "Curator" },
 ];
 const ROLE_LABEL = { admin: "Admin", member: "Member", curator: "Curator" };
-const STATUS_LABEL = { pending: "Menunggu", approved: "Disetujui", rejected: "Ditolak" };
+const STATUS_LABEL = { pending: "Pending", approved: "Approved", rejected: "Rejected" };
 
 export default async function UsersPage({ searchParams }) {
   const admin = await requireRole("admin");
@@ -37,16 +37,16 @@ export default async function UsersPage({ searchParams }) {
   const params = { role, q };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-deep-forest">Manajemen Pengguna</h1>
-        <p className="mt-1 text-sm text-deep-forest/70">
-          {total} pengguna. Admin hanya dapat menghapus akun Member dan Curator.
+        <h1 className="font-display text-3xl font-semibold text-ink">User Management</h1>
+        <p className="mt-1 text-sm text-mute">
+          {total} users registered. Admins can manage and remove Member or Curator accounts.
         </p>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <nav aria-label="Filter peran" className="flex flex-wrap gap-2">
+        <nav aria-label="Role filter" className="flex flex-wrap gap-2">
           {ROLE_FILTERS.map((f) => {
             const active = role === f.value;
             return (
@@ -54,10 +54,10 @@ export default async function UsersPage({ searchParams }) {
                 key={f.value || "all"}
                 href={`/admin/users${buildQuery({ q }, { role: f.value || null })}`}
                 aria-current={active ? "true" : undefined}
-                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition ${
+                className={`rounded-full border px-4 py-1.5 text-xs font-semibold transition ${
                   active
-                    ? "border-forest bg-forest text-ivory"
-                    : "border-deep-forest/25 bg-white text-deep-forest hover:border-forest"
+                    ? "border-ink bg-ink text-white"
+                    : "border-line bg-white text-ink hover:border-ink/50"
                 }`}
               >
                 {f.label}
@@ -68,72 +68,72 @@ export default async function UsersPage({ searchParams }) {
 
         <form action="/admin/users" method="get" role="search" className="flex gap-2">
           {role && <input type="hidden" name="role" value={role} />}
-          <label htmlFor="user-search" className="sr-only">Cari nama atau email</label>
+          <label htmlFor="user-search" className="sr-only">Search by name or email</label>
           <input
             id="user-search"
             name="q"
             defaultValue={q}
             maxLength={100}
-            placeholder="Cari nama atau email"
-            className="w-56 rounded-xl border border-deep-forest/25 bg-white px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-forest"
+            placeholder="Search by name or email"
+            className="w-64 rounded-full border border-line bg-white px-4 py-2 text-xs text-ink outline-none transition focus:border-ink focus:ring-1 focus:ring-ink"
           />
           <button
             type="submit"
-            className="rounded-xl bg-forest px-4 py-2 text-sm font-semibold text-ivory transition hover:bg-deep-forest"
+            className="rounded-full bg-ink px-5 py-2 text-xs font-semibold text-white transition hover:bg-people"
           >
-            Cari
+            Search
           </button>
         </form>
       </div>
 
       {users.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-deep-forest/25 bg-white px-6 py-12 text-center text-sm text-deep-forest/70">
-          Tidak ada pengguna yang cocok.
-        </p>
+        <div className="rounded-2xl border border-line bg-white px-6 py-14 text-center shadow-sm">
+          <p className="font-display text-xl font-semibold text-ink">No users match your filters.</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-deep-forest/10 bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
           <table className="w-full min-w-[44rem] text-left">
-            <thead className="bg-sage/30 text-xs uppercase tracking-wide text-deep-forest">
+            <thead className="border-b border-line bg-soft text-[11px] uppercase tracking-wider text-mute">
               <tr>
-                <th scope="col" className="px-4 py-3 font-semibold">Nama</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Email</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Peran</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Karya</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Terdaftar</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Aksi</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Name</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Email</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Role</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Artworks</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Registered</th>
+                <th scope="col" className="px-5 py-3.5 font-semibold">Action</th>
               </tr>
             </thead>
             <tbody>
               {users.map((u) => {
                 const deletable = u.role !== "admin" && u.id !== admin.id;
                 return (
-                  <tr key={u.id} className="border-t border-deep-forest/10 align-top">
-                    <td className="px-4 py-3 text-sm font-medium text-deep-forest">
+                  <tr key={u.id} className="border-t border-line/60 align-top transition hover:bg-soft/40">
+                    <td className="px-5 py-3.5 text-sm font-medium text-ink">
                       {u.display_name}
-                      {u.id === admin.id && <span className="ml-2 text-xs text-deep-forest/60">(Anda)</span>}
+                      {u.id === admin.id && <span className="ml-2 text-xs text-mute">(You)</span>}
                     </td>
-                    <td className="px-4 py-3 text-sm text-deep-forest">{u.email}</td>
-                    <td className="px-4 py-3 text-sm text-deep-forest">
-                      {ROLE_LABEL[u.role]}
+                    <td className="px-5 py-3.5 text-sm text-mute">{u.email}</td>
+                    <td className="px-5 py-3.5 text-sm text-ink">
+                      <span className="font-medium">{ROLE_LABEL[u.role]}</span>
                       {u.role === "curator" && (
-                        <span className="block text-xs text-deep-forest/70">{STATUS_LABEL[u.curator_status]}</span>
+                        <span className="block text-xs text-mute">{STATUS_LABEL[u.curator_status]}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-sm text-deep-forest">{u.artwork_count}</td>
-                    <td className="px-4 py-3 text-sm text-deep-forest">{formatDate(u.created_at)}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-5 py-3.5 text-sm text-ink">{u.artwork_count}</td>
+                    <td className="px-5 py-3.5 text-xs text-mute">{formatDate(u.created_at)}</td>
+                    <td className="px-5 py-3.5">
                       {deletable ? (
                         <ActionButton
                           action={deleteUserAction}
                           fields={{ userId: u.id }}
-                          label="Hapus"
-                          pendingLabel="Menghapus..."
+                          label="Delete"
+                          pendingLabel="Deleting..."
                           tone="danger"
-                          confirmMessage={`Hapus akun ${u.display_name} beserta seluruh karyanya? Tindakan ini permanen.`}
-                          confirmLabel="Ya, hapus"
+                          confirmMessage={`Permanently delete user ${u.display_name} and their artworks?`}
+                          confirmLabel="Yes, delete"
                         />
                       ) : (
-                        <span className="text-sm text-deep-forest/50">Tidak dapat dihapus</span>
+                        <span className="text-xs text-mute">Protected</span>
                       )}
                     </td>
                   </tr>

@@ -7,31 +7,31 @@ export default function CategoryCreateForm() {
   const [state, formAction, pending] = useActionState(addCategoryAction, {});
 
   return (
-    <form action={formAction} className="rounded-2xl border border-deep-forest/10 bg-white p-5 shadow-sm">
-      <label htmlFor="category-name" className="mb-1.5 block text-sm font-medium text-deep-forest">
-        Tambah kategori baru
+    <form action={formAction} className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+      <label htmlFor="category-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mute">
+        Add New Category
       </label>
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           id="category-name"
           name="name"
           defaultValue={state.name ?? ""}
-          placeholder="Contoh: Marine Life"
+          placeholder="e.g. Marine Life"
           aria-invalid={state.error ? "true" : "false"}
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-deep-forest outline-none focus:ring-2 focus:ring-forest ${
-            state.error ? "border-red-600" : "border-deep-forest/25"
+          className={`w-full rounded-full border bg-white px-5 py-2.5 text-sm text-ink outline-none transition placeholder:text-mute/50 focus:border-ink focus:ring-1 focus:ring-ink ${
+            state.error ? "border-people ring-1 ring-people/30" : "border-line hover:border-ink/40"
           }`}
         />
         <button
           type="submit"
           disabled={pending}
-          className="rounded-xl bg-forest px-5 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+          className="shrink-0 rounded-full bg-ink px-7 py-2.5 text-sm font-semibold text-white transition hover:bg-people disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {pending ? "Menyimpan..." : "Tambah"}
+          {pending ? "Adding..." : "Add category"}
         </button>
       </div>
       {state.error && (
-        <p role="alert" className="mt-2 text-xs font-medium text-red-700">
+        <p role="alert" className="mt-2 text-xs font-medium text-people">
           {state.error}
         </p>
       )}

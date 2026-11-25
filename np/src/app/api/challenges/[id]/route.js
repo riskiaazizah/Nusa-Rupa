@@ -28,7 +28,7 @@ export async function PATCH(request, { params }) {
   const { errors, data, banner } = await readChallengeForm(form, { bannerRequired: false });
   if (Object.keys(errors).length > 0) return NextResponse.json({ errors }, { status: 400 });
 
-  const newBannerUrl = banner ? await saveUpload(banner.buffer, banner.type.ext, "banners") : null;
+  const newBannerUrl = banner ? await saveUpload(banner.buffer, banner.type.ext, "banners", data.title) : null;
   try {
     const result = await updateChallenge(challengeId, user.id, data, newBannerUrl); // WHERE curator_id: cek pemilik
     if (result.status !== "updated") {
