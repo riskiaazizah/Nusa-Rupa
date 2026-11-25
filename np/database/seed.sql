@@ -49,26 +49,26 @@ INSERT INTO tags (name) VALUES
  ('reforestation'),
  ('sustainable living');
 
--- ARTWORKS (gambar placeholder ada di public/uploads/seed/)
+-- ARTWORKS (tersedia di public/uploads/artworks/)
 INSERT INTO artworks (id, user_id, category_id, title, description, file_url, created_at) VALUES
  (1, 2, 2, 'Mata Terakhir di Hutan Kalimantan',
   'Ilustrasi orangutan yang menatap hamparan sawit di tepi hutan yang menyusut.',
-  '/uploads/seed/art-1.svg', NOW() - INTERVAL '10 days'),
+  '/uploads/artworks/gambar-1.png', NOW() - INTERVAL '10 days'),
  (2, 3, 4, 'Asap di Atas Gambut',
   'Dokumentasi digital kabut asap yang menutup lahan gambut setelah kebakaran.',
-  '/uploads/seed/art-2.svg', NOW() - INTERVAL '9 days'),
+  '/uploads/artworks/gambar-2.png', NOW() - INTERVAL '9 days'),
  (3, 2, 1, 'Anggrek Hutan Hujan',
   'Studi botani anggrek endemik yang habitatnya terus berkurang.',
-  '/uploads/seed/art-3.svg', NOW() - INTERVAL '7 days'),
+  '/uploads/artworks/gambar-3.png', NOW() - INTERVAL '7 days'),
  (4, 4, 3, 'Suara dari Hutan Adat',
   'Potret komunitas adat yang mempertahankan hutan sebagai ruang hidup.',
-  '/uploads/seed/art-4.svg', NOW() - INTERVAL '5 days'),
+  '/uploads/artworks/gambar-4.png', NOW() - INTERVAL '5 days'),
  (5, 4, 5, 'Tenun dan Tanah',
   'Motif tenun yang terinspirasi pengetahuan lokal tentang tanah dan tanaman.',
-  '/uploads/seed/art-5.svg', NOW() - INTERVAL '3 days'),
+  '/uploads/artworks/gambar-5.png', NOW() - INTERVAL '3 days'),
  (6, 3, 6, 'Menanam Kembali Mangrove',
   'Warga pesisir menanam bibit mangrove untuk memulihkan garis pantai.',
-  '/uploads/seed/art-6.svg', NOW() - INTERVAL '1 days');
+  '/uploads/artworks/gambar-6.png', NOW() - INTERVAL '1 days');
 
 -- TAGS PER KARYA (mengambil id tag berdasarkan nama)
 INSERT INTO artwork_tags (artwork_id, tag_id)
