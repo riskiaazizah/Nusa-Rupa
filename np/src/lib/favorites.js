@@ -5,7 +5,9 @@ export async function listFavorites(userId) {
     `SELECT a.id, a.title, a.file_url, a.created_at,
             c.id AS category_id, c.name AS category_name,
             a.user_id AS creator_id, p.display_name AS creator_name,
-            (SELECT COUNT(*)::int FROM likes l WHERE l.artwork_id = a.id) AS like_count
+            (SELECT COUNT(*)::int FROM likes l WHERE l.artwork_id = a.id) AS like_count,
+            EXISTS (SELECT 1 FROM likes l WHERE l.artwork_id = a.id AND l.user_id = $1::int) AS liked,
+            true AS favorited
        FROM favorites f
        JOIN artworks a ON a.id = f.artwork_id
        JOIN categories c ON c.id = a.category_id

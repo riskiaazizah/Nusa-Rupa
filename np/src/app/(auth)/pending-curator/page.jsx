@@ -35,7 +35,7 @@ export default async function PendingCuratorPage() {
           type="submit"
           className="w-full rounded-full border border-line bg-white px-6 py-2.5 text-sm font-semibold text-ink transition hover:border-ink hover:bg-soft"
         >
-          Log out
+          Back
         </button>
       </form>
     </div>

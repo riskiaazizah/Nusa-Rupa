@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import ProfileDropdown from "./ProfileDropdown";
 
 export default function NavbarClient({ user, dashboardHref }) {
   const pathname = usePathname();
@@ -117,41 +118,12 @@ export default function NavbarClient({ user, dashboardHref }) {
           {/* Right User Actions */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <div className="flex items-center gap-4">
-                <Link
-                  href={dashboardHref}
-                  className={`group relative py-1 text-sm font-medium transition-colors ${
-                    isTransparent
-                      ? isDashboardActive
-                        ? "text-white font-semibold"
-                        : "text-white/80 hover:text-white"
-                      : isDashboardActive
-                      ? "text-people font-semibold"
-                      : "text-ink hover:text-people"
-                  }`}
-                >
-                  <span>Dashboard</span>
-                  <span
-                    aria-hidden="true"
-                    className={`absolute -bottom-1 left-0 h-[2px] w-full transition-all duration-200 ${
-                      isTransparent ? "bg-white" : "bg-people"
-                    } ${
-                      isDashboardActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
-                    }`}
-                  />
-                </Link>
-                <form action="/api/auth/logout" method="post">
-                  <button
-                    type="submit"
-                    className={`rounded-full px-4 py-1.5 text-xs font-semibold tracking-wider uppercase transition ${
-                      isTransparent
-                        ? "border border-white/40 text-white hover:bg-white/10 hover:border-white"
-                        : "border border-line text-ink hover:border-ink hover:bg-soft"
-                    }`}
-                  >
-                    Log out
-                  </button>
-                </form>
+              <div className="flex items-center">
+                <ProfileDropdown
+                  user={user}
+                  role={user?.role}
+                  transparent={isTransparent}
+                />
               </div>
             ) : (
               <div className="flex items-center gap-4">

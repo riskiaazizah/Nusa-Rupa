@@ -35,7 +35,7 @@ export default async function MyFavoritesPage() {
         <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {favorites.map((art) => (
             <li key={art.id}>
-              <ArtworkCard artwork={art} />
+              <ArtworkCard artwork={art} userRole={user.role} />
             </li>
           ))}
         </ul>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus } from "lucide-react";
 
 const BASE =
-  "w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-mute/50 focus:border-forest focus:ring-1 focus:ring-forest";
+  "w-full rounded-xl border border-line bg-white px-4 py-3 text-sm sm:text-base text-ink outline-none transition placeholder:text-mute/50 focus:border-forest focus:ring-1 focus:ring-forest";
 
 const THEME_ISSUE_TAGS = [
   // Forest Pillar (Green #1f6b45)
@@ -31,14 +31,14 @@ const THEME_ISSUE_TAGS = [
 function Field({ id, label, error, hint, required, children }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mute">
+      <label htmlFor={id} className="mb-2 block text-sm font-semibold tracking-wide text-ink/80">
         {label}
         {required && <span className="ml-1 text-people">*</span>}
       </label>
       {children}
-      {hint && !error && <p className="mt-1 text-xs text-mute">{hint}</p>}
+      {hint && !error && <p className="mt-1.5 text-xs sm:text-sm text-mute">{hint}</p>}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs font-medium text-people">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs sm:text-sm font-medium text-people">
           {error}
         </p>
       )}

@@ -9,9 +9,6 @@ import { updateProfile } from "@/lib/profile";
 export async function PATCH(request) {
   const user = await getSession();
   if (!user) return NextResponse.json({ error: "Silakan login terlebih dahulu." }, { status: 401 });
-  if (user.role !== "member") {
-    return NextResponse.json({ error: "Hanya Member yang memiliki profil kreator." }, { status: 403 });
-  }
 
   let form;
   try {

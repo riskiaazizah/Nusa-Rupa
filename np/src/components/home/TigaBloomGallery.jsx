@@ -2,6 +2,15 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, ExternalLink, Heart } from "lucide-react";
+
+const spring = {
+  type: "spring",
+  stiffness: 350,
+  damping: 35,
+  mass: 1,
+};
 
 const PILLARS = {
   forest: {
@@ -28,77 +37,44 @@ const PILLARS = {
 };
 
 const PILLAR_KEYS = ["forest", "animals", "people"];
-const IDLE_MS = 7000;
-const READY_FALLBACK_MS = 1200;
 
 function getArtworkPillar(artwork) {
   const cat = (artwork.category_name || "").toLowerCase();
   for (const key of PILLAR_KEYS) {
     if (PILLARS[key].categories.includes(cat)) return key;
   }
-  return "forest"; // default fallback
+  return "forest";
 }
 
 export default function TigaBloomGallery({
   artworks = [],
-  columns = 4,
   aspect = "4 / 5",
   gap = 20,
-  autoplay = true,
-  interval = 3200,
-  bloomDuration = 700,
 }) {
+  const [selectedArtwork, setSelectedArtwork] = React.useState(null);
   const [selectedPillar, setSelectedPillar] = React.useState("all");
-  const [ready, setReady] = React.useState(false);
-  const [hovered, setHovered] = React.useState(null);
-  const [reducedMotion, setReducedMotion] = React.useState(false);
-  const pausedUntil = React.useRef(0);
-  const valueRef = React.useRef(selectedPillar);
-  valueRef.current = selectedPillar;
   const chipRefs = React.useRef([]);
 
-  // Check reduced motion preference
+  // Handle escape key for expanded view
   React.useEffect(() => {
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onMotion = () => setReducedMotion(motion.matches);
-    onMotion();
-    motion.addEventListener("change", onMotion);
-    return () => motion.removeEventListener("change", onMotion);
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setSelectedArtwork(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Preload visible images
+  // Lock body scroll when modal is open
   React.useEffect(() => {
-    let done = false;
-    const markReady = () => {
-      if (!done) setReady(true);
-      done = true;
-    };
-
-    let loaded = 0;
-    const targets = artworks.slice(0, 16);
-    if (targets.length === 0) {
-      markReady();
-      return;
+    if (selectedArtwork) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
     }
-
-    const imgs = targets.map((art) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.onload = img.onerror = () => {
-        loaded += 1;
-        if (loaded >= targets.length) markReady();
-      };
-      img.src = art.file_url;
-      return img;
-    });
-
-    const fallback = window.setTimeout(markReady, READY_FALLBACK_MS);
     return () => {
-      done = true;
-      window.clearTimeout(fallback);
-      for (const img of imgs) img.onload = img.onerror = null;
+      document.body.style.overflow = "auto";
     };
-  }, [artworks]);
+  }, [selectedArtwork]);
 
   // Pillar counts
   const counts = React.useMemo(() => {
@@ -112,40 +88,21 @@ export default function TigaBloomGallery({
 
   const choices = ["all", "forest", "animals", "people"];
 
-  const choose = React.useCallback((next, fromUser) => {
-    if (fromUser) pausedUntil.current = Date.now() + IDLE_MS;
-    setSelectedPillar(next);
-  }, []);
-
-  // Gentle autoplay through the 3 pillars when idle
-  React.useEffect(() => {
-    if (!autoplay || reducedMotion || !ready || artworks.length === 0) return;
-    const sequence = ["forest", "animals", "people", "all"];
-    const timer = window.setInterval(() => {
-      if (Date.now() < pausedUntil.current) return;
-      const at = sequence.indexOf(valueRef.current);
-      choose(sequence[(at + 1) % sequence.length], false);
-    }, interval);
-    return () => window.clearInterval(timer);
-  }, [autoplay, reducedMotion, ready, artworks.length, interval, choose]);
-
   // Keyboard navigation for chips
   const onChipKey = (event) => {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     event.preventDefault();
     const at = Math.max(0, choices.indexOf(selectedPillar));
     const next = (at + (event.key === "ArrowRight" ? 1 : -1) + choices.length) % choices.length;
-    choose(choices[next], true);
+    setSelectedPillar(choices[next]);
     chipRefs.current[next]?.focus();
   };
 
-  const matchRank = new Map();
-  artworks.forEach((art, index) => {
-    const p = getArtworkPillar(art);
-    if (selectedPillar === "all" || p === selectedPillar) {
-      matchRank.set(index, matchRank.size);
-    }
-  });
+  // Filter artworks strictly by selected pillar (always full color, zero grayscale)
+  const visibleArtworks = React.useMemo(() => {
+    if (selectedPillar === "all") return artworks;
+    return artworks.filter((art) => getArtworkPillar(art) === selectedPillar);
+  }, [artworks, selectedPillar]);
 
   const activeLabel =
     selectedPillar === "all"
@@ -177,7 +134,7 @@ export default function TigaBloomGallery({
                 role="radio"
                 aria-checked={selected}
                 tabIndex={selected ? 0 : -1}
-                onClick={() => choose(choice, true)}
+                onClick={() => setSelectedPillar(choice)}
                 className={`group inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
                   selected
                     ? "border-ink bg-ink text-white shadow-xs"
@@ -209,74 +166,34 @@ export default function TigaBloomGallery({
         </p>
       </div>
 
-      {/* Grid of Blooming Artworks */}
+      {/* Grid of Artworks (Always Vibrant Full Color, Shared Element Transition) */}
       <div
         role="list"
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
         style={{ gap }}
       >
-        {artworks.map((art, index) => {
+        {visibleArtworks.map((art) => {
           const pillarKey = getArtworkPillar(art);
           const pillar = PILLARS[pillarKey];
-          const rank = matchRank.get(index);
-          const matches = rank !== undefined;
-          const isHovered = hovered?.index === index;
-          const colored = ready && (matches || isHovered);
-          const dimmed = ready && !matches && !isHovered;
-          const originX = isHovered ? hovered.x : 50;
-          const originY = isHovered ? hovered.y : 50;
-          const delay = colored && !isHovered && rank !== undefined ? Math.min(rank * 60, 420) : 0;
 
           return (
             <div key={art.id} role="listitem" className="min-w-0">
-              <Link
-                href={`/artworks/${art.id}`}
+              <motion.div
                 data-artwork-id={art.id}
-                onPointerEnter={(event) => {
-                  if (event.pointerType === "touch") return;
-                  const rect = event.currentTarget.getBoundingClientRect();
-                  setHovered({
-                    index,
-                    x: ((event.clientX - rect.left) / rect.width) * 100,
-                    y: ((event.clientY - rect.top) / rect.height) * 100,
-                  });
-                }}
-                onPointerLeave={() => setHovered((cur) => (cur?.index === index ? null : cur))}
-                onFocus={() => setHovered({ index, x: 50, y: 50 })}
-                onBlur={() => setHovered((cur) => (cur?.index === index ? null : cur))}
-                className="group relative block w-full overflow-hidden rounded-2xl bg-soft border border-line outline-none transition-[opacity,transform,box-shadow] duration-500 ease-out hover:border-ink hover:shadow-lg"
-                style={{
-                  aspectRatio: aspect,
-                  opacity: dimmed ? 0.38 : 1,
-                  transform: dimmed ? "scale(0.97)" : "scale(1)",
-                }}
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedArtwork(art)}
+                className="group relative block w-full overflow-hidden rounded-2xl bg-soft border border-line outline-none cursor-zoom-in transition-all duration-300 hover:border-ink/40 hover:shadow-xl"
+                style={{ aspectRatio: aspect }}
               >
-                {/* 1. Grayscale Base Image (symbol of smoke & ash) */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* 100% Vibrant Full-Color Image with Shared Element Layout ID */}
+                <motion.img
+                  layoutId={`image-${art.id}`}
                   src={art.file_url}
                   alt={art.title}
                   draggable={false}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  style={{ filter: "grayscale(1) contrast(1.1) brightness(0.94)" }}
-                />
-
-                {/* 2. Full-Color Blooming Overlay (art speaking into life) */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={art.file_url}
-                  alt=""
-                  aria-hidden="true"
-                  draggable={false}
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  style={{
-                    clipPath: `circle(${colored ? 150 : 0}% at ${originX}% ${originY}%)`,
-                    transition: reducedMotion
-                      ? "none"
-                      : colored
-                      ? `clip-path ${bloomDuration}ms cubic-bezier(0.22, 0.8, 0.2, 1) ${delay}ms, transform 700ms ease-out`
-                      : `clip-path ${Math.round(bloomDuration * 0.55)}ms cubic-bezier(0.4, 0, 1, 1), transform 700ms ease-out`,
-                  }}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  transition={spring}
                 />
 
                 {/* Top-Left Pillar Badge */}
@@ -289,11 +206,18 @@ export default function TigaBloomGallery({
                   <span>{pillar.label}</span>
                 </div>
 
-                {/* Bottom Editorial Caption */}
-                <div
-                  className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/50 to-transparent p-4 pt-10 text-white transition-opacity duration-300"
-                  style={{ opacity: colored ? 1 : 0.8 }}
+                {/* Top-Right Quick Link to Details */}
+                <Link
+                  href={`/artworks/${art.id}`}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`View story for ${art.title}`}
+                  className="absolute top-3 right-3 z-20 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 backdrop-blur-xs text-white opacity-0 group-hover:opacity-100 hover:bg-white hover:text-ink transition shadow-xs"
                 >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+
+                {/* Bottom Editorial Caption */}
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-4 pt-10 text-white">
                   <p className="text-[11px] uppercase tracking-wider text-white/70">
                     {art.category_name}
                   </p>
@@ -307,11 +231,112 @@ export default function TigaBloomGallery({
                     </span>
                   </div>
                 </div>
-              </Link>
+              </motion.div>
             </div>
           );
         })}
       </div>
+
+      {/* Expanded Shared-Element View Modal with Drag-to-Dismiss */}
+      <AnimatePresence>
+        {selectedArtwork && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
+            {/* Frosted glass backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 bg-black/85 backdrop-blur-2xl"
+              onClick={() => setSelectedArtwork(null)}
+            />
+
+            {/* Interactive container for drag gesture */}
+            <motion.div
+              className="relative z-10 w-full h-full flex flex-col items-center justify-center cursor-zoom-out select-none"
+              drag="y"
+              dragConstraints={{ top: 0, bottom: 0 }}
+              dragElastic={0.8}
+              onDragEnd={(e, info) => {
+                if (
+                  Math.abs(info.offset.y) > 100 ||
+                  Math.abs(info.velocity.y) > 300
+                ) {
+                  setSelectedArtwork(null);
+                }
+              }}
+              onClick={() => setSelectedArtwork(null)}
+            >
+              {/* The Shared Element (Full Color High-Res) */}
+              <motion.img
+                layoutId={`image-${selectedArtwork.id}`}
+                src={selectedArtwork.file_url}
+                alt={selectedArtwork.title}
+                className="w-auto h-auto max-w-[92vw] max-h-[74vh] sm:max-h-[78vh] rounded-2xl shadow-2xl object-contain will-change-transform"
+                draggable={false}
+                transition={spring}
+              />
+
+              {/* Editorial TIGA Artwork Info Overlay Card */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 15 }}
+                transition={{ delay: 0.15, duration: 0.25 }}
+                className="mt-4 flex flex-wrap items-center justify-between gap-4 max-w-2xl w-full bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl px-5 py-3.5 text-white pointer-events-auto shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="min-w-0 space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{
+                        backgroundColor:
+                          PILLARS[getArtworkPillar(selectedArtwork)]?.color || "#1f6b45",
+                      }}
+                    />
+                    <span className="text-[11px] font-semibold uppercase tracking-widest text-white/70">
+                      {selectedArtwork.category_name}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-xl sm:text-2xl font-semibold truncate text-white">
+                    {selectedArtwork.title}
+                  </h3>
+                  <p className="text-xs text-white/80 truncate">
+                    by <span className="font-medium text-white">{selectedArtwork.creator_name}</span>
+                    {typeof selectedArtwork.like_count === "number" && (
+                      <span className="ml-3 inline-flex items-center gap-1 text-[11px] text-white/70">
+                        <Heart className="h-3 w-3 fill-current text-white/60" /> {selectedArtwork.like_count}
+                      </span>
+                    )}
+                  </p>
+                </div>
+
+                <Link
+                  href={`/artworks/${selectedArtwork.id}`}
+                  className="shrink-0 flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-ink hover:bg-cream transition shadow-xs"
+                >
+                  <span>View Full Story</span>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Close Button */}
+            <motion.button
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: 0.1, duration: 0.2 }}
+              className="absolute top-6 right-6 z-50 p-3 bg-white/10 text-white rounded-full backdrop-blur-md hover:bg-white/20 transition-colors cursor-pointer"
+              onClick={() => setSelectedArtwork(null)}
+              aria-label="Close gallery"
+            >
+              <X className="w-5 h-5" />
+            </motion.button>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

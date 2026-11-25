@@ -49,16 +49,29 @@ export async function listArtworks({
   categoryId,
   tag,
   creatorId,
+  userId = null,
   sort = "latest",
   limit = 12,
   offset = 0,
 } = {}) {
   const { clause, params } = buildFilters({ q, categoryId, tag, creatorId });
+  params.push(userId ? Number(userId) : null);
+  const userParamIndex = params.length;
   params.push(limit, offset);
+
   return query(
-    `${CARD_SELECT} ${clause}
-      ORDER BY ${SORTS[sort] ?? SORTS.latest}
-      LIMIT $${params.length - 1} OFFSET $${params.length}`,
+    `SELECT a.id, a.title, a.file_url, a.created_at,
+            c.id AS category_id, c.name AS category_name,
+            a.user_id AS creator_id, p.display_name AS creator_name,
+            (SELECT COUNT(*)::int FROM likes l WHERE l.artwork_id = a.id) AS like_count,
+            EXISTS (SELECT 1 FROM likes l WHERE l.artwork_id = a.id AND l.user_id = $${userParamIndex}::int) AS liked,
+            EXISTS (SELECT 1 FROM favorites f WHERE f.artwork_id = a.id AND f.user_id = $${userParamIndex}::int) AS favorited
+       FROM artworks a
+       JOIN categories c ON c.id = a.category_id
+       JOIN profiles p ON p.user_id = a.user_id
+       ${clause}
+       ORDER BY ${SORTS[sort] ?? SORTS.latest}
+       LIMIT $${params.length - 1} OFFSET $${params.length}`,
     params
   );
 }

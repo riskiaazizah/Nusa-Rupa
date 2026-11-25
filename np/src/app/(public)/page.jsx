@@ -8,9 +8,9 @@ import CollectionCatalog from "@/components/home/CollectionCatalog";
 import ChallengeCard from "@/components/ChallengeCard";
 
 export default async function HomePage() {
-  const [user, artworks, categories, activeChallenges] = await Promise.all([
-    getSession(),
-    listArtworks({ limit: 100 }),
+  const user = await getSession();
+  const [artworks, categories, activeChallenges] = await Promise.all([
+    listArtworks({ limit: 100, userId: user?.id }),
     listCategories(),
     listChallenges({ status: "active", limit: 3 }),
   ]);
@@ -52,32 +52,6 @@ export default async function HomePage() {
           </div>
         </section>
       )}
-
-      {/* 4. Editorial Footnotes Section */}
-      <section className="border-t border-line py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2 border-l-2 border-forest pl-4">
-              <p className="font-display text-3xl sm:text-4xl font-bold text-ink">243,241 ha</p>
-              <p className="text-xs text-mute leading-relaxed">
-                Peatland burned in Indonesia, releasing decades of stored carbon. Source: Pantau Gambut (2026).
-              </p>
-            </div>
-            <div className="space-y-2 border-l-2 border-animals pl-4">
-              <p className="font-display text-3xl sm:text-4xl font-bold text-ink">41.1M</p>
-              <p className="text-xs text-mute leading-relaxed">
-                People exposed to hazardous haze and smoke in Sumatra and Kalimantan. Source: Greenpeace Indonesia.
-              </p>
-            </div>
-            <div className="space-y-2 border-l-2 border-people pl-4">
-              <p className="font-display text-3xl sm:text-4xl font-bold text-ink">31M tons</p>
-              <p className="text-xs text-mute leading-relaxed">
-                Estimated greenhouse gas emissions from peat and forest fires. Source: WALHI Indonesia.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

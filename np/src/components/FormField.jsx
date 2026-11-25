@@ -23,8 +23,8 @@ export default function FormField({
   return (
     <div>
       {label && (
-        <div className="mb-1.5 flex items-center justify-between gap-2">
-          <label htmlFor={id} className="block text-xs font-semibold uppercase tracking-wider text-mute">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <label htmlFor={id} className="block text-sm font-semibold tracking-wide text-ink/80">
             {label}
             {required && <span className="ml-1 text-people">*</span>}
           </label>
@@ -43,7 +43,7 @@ export default function FormField({
           required={required}
           aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? errorId : undefined}
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-mute/50 focus:border-ink focus:ring-1 focus:ring-ink ${
+          className={`w-full rounded-xl border bg-white px-4 py-3 text-sm sm:text-base text-ink outline-none transition placeholder:text-mute/50 focus:border-ink focus:ring-1 focus:ring-ink ${
             error ? "border-people ring-1 ring-people/30" : "border-line hover:border-ink/40"
           } ${isPassword ? "pr-20" : ""}`}
         />
@@ -51,15 +51,15 @@ export default function FormField({
           <button
             type="button"
             onClick={() => setShow((s) => !s)}
-            className="absolute inset-y-0 right-3 text-xs font-medium text-mute hover:text-ink"
+            className="absolute inset-y-0 right-3 text-sm font-medium text-mute hover:text-ink"
           >
             {show ? "Hide" : "Show"}
           </button>
         )}
       </div>
-      {hint && !error && <p className="mt-1 text-xs text-mute">{hint}</p>}
+      {hint && !error && <p className="mt-1.5 text-xs sm:text-sm text-mute">{hint}</p>}
       {error && (
-        <p id={errorId} role="alert" className="mt-1.5 text-xs font-medium text-people">
+        <p id={errorId} role="alert" className="mt-1.5 text-xs sm:text-sm font-medium text-people">
           {error}
         </p>
       )}

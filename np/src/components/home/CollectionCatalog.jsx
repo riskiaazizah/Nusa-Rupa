@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import ArtworkCard from "@/components/ArtworkCard";
 import CardInteractionButtons from "@/components/artwork/CardInteractionButtons";
+import AnimatedStats from "./AnimatedStats";
 
 const ISSUE_TAGS = [
   "palm oil expansion",
@@ -52,7 +53,6 @@ const CATEGORY_GROUPS = {
 };
 
 export default function CollectionCatalog({ initialArtworks = [], categories = [], user }) {
-  const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [sort, setSort] = useState("newest"); // "newest" | "popular" | "az"
@@ -105,13 +105,6 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
   const filtered = useMemo(() => {
     return initialArtworks
       .filter((art) => {
-        // Search text
-        if (search.trim()) {
-          const q = search.toLowerCase();
-          const matchTitle = art.title.toLowerCase().includes(q);
-          const matchArtist = (art.creator_name || "").toLowerCase().includes(q);
-          if (!matchTitle && !matchArtist) return false;
-        }
         // Category
         if (selectedCategory !== null && art.category_id !== selectedCategory) {
           return false;
@@ -137,10 +130,9 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
         // newest default
         return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       });
-  }, [initialArtworks, search, selectedCategory, selectedTag, selectedArtist, sort]);
+  }, [initialArtworks, selectedCategory, selectedTag, selectedArtist, sort]);
 
   const clearFilters = () => {
-    setSearch("");
     setSelectedCategory(null);
     setSelectedTag("");
     setSelectedArtist("");
@@ -148,20 +140,13 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
   };
 
   const hasActiveFilters = Boolean(
-    search || selectedCategory !== null || selectedTag || selectedArtist || sort !== "newest"
+    selectedCategory !== null || selectedTag || selectedArtist || sort !== "newest"
   );
 
   return (
-    <section id="collection" className="scroll-mt-24 py-16 sm:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-      {/* Section Header */}
-      <div className="space-y-3 max-w-2xl">
-        <h2 className="font-display text-4xl sm:text-5xl font-semibold text-ink tracking-tight">
-          The Collection
-        </h2>
-        <p className="text-base sm:text-lg text-mute">
-          Works on forests, wildlife, and the people living under the smoke.
-        </p>
-      </div>
+    <section id="collection" className="scroll-mt-24 py-12 sm:py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      {/* Impact Statistics Counter (Moved to top of collection) */}
+      <AnimatedStats />
 
       {/* Category Tiles (Blueprint style with issue background images) */}
       <div className="space-y-6">
@@ -260,29 +245,8 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
         </div>
       </div>
 
-      {/* Search and Filters Bar */}
-      <div className="space-y-4 rounded-2xl border border-line bg-soft/60 p-4 sm:p-6">
-        {/* Full width Search */}
-        <div className="relative">
-          <input
-            type="search"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by title or artist..."
-            aria-label="Search artworks"
-            className="w-full rounded-xl border border-line bg-white px-4 py-3 text-sm text-ink outline-none placeholder:text-mute focus:border-ink focus:ring-1 focus:ring-ink"
-          />
-          {search && (
-            <button
-              type="button"
-              onClick={() => setSearch("")}
-              className="absolute right-3 top-3 text-xs text-mute hover:text-ink font-bold"
-            >
-              Clear
-            </button>
-          )}
-        </div>
-
+      {/* Filters Bar */}
+      <div className="rounded-2xl border border-line bg-soft/60 p-4 sm:p-5">
         {/* Filter dropdowns + Clear button */}
         <div className="flex flex-wrap items-center gap-3">
           {/* Category Dropdown */}

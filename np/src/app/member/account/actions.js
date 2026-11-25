@@ -1,11 +1,13 @@
 "use server";
 
-import { requireRole } from "@/lib/session";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 import { validateAccountInput } from "@/lib/validateMember";
 import { changeAccount } from "@/lib/account";
 
 export async function updateAccountAction(prevState, formData) {
-  const user = await requireRole("member"); // userId selalu dari sesi, bukan dari form
+  const user = await getSession();
+  if (!user) redirect("/login");
 
   const { ok, errors, data } = validateAccountInput({
     currentPassword: formData.get("currentPassword"),

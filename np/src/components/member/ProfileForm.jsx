@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2, AlertCircle, X } from "lucide-react";
 import FormField from "@/components/FormField";
 
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_LINKS = 5;
 const INPUT =
-  "w-full rounded-xl border border-deep-forest/25 bg-white px-3 py-2 text-sm text-deep-forest outline-none focus:ring-2 focus:ring-forest";
+  "w-full rounded-xl border border-deep-forest/25 bg-white px-4 py-2.5 text-sm sm:text-base text-deep-forest outline-none focus:ring-2 focus:ring-forest";
 
 export default function ProfileForm({ profile }) {
   const router = useRouter();
@@ -22,6 +23,14 @@ export default function ProfileForm({ profile }) {
   const [formError, setFormError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!success) return;
+    const timer = setTimeout(() => {
+      setSuccess(false);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, [success]);
 
   useEffect(() => {
     return () => {
@@ -98,15 +107,56 @@ export default function ProfileForm({ profile }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="max-w-2xl space-y-6">
+      {/* Floating Pop-Up Error Notification */}
       {formError && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-          {formError}
-        </p>
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="fixed top-24 right-4 sm:right-8 z-50 flex items-start gap-3.5 rounded-2xl border border-people/20 bg-white/95 backdrop-blur-md p-4 shadow-2xl animate-in slide-in-from-top-4 fade-in-0 duration-300 max-w-sm w-full"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-people/10 text-people mt-0.5">
+            <AlertCircle className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0 pr-1">
+            <p className="text-sm font-semibold text-ink">Gagal menyimpan profil</p>
+            <p className="mt-0.5 text-xs text-mute leading-relaxed">{formError}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFormError("")}
+            className="text-mute hover:text-ink p-1 rounded-lg hover:bg-soft transition cursor-pointer shrink-0"
+            aria-label="Tutup pemberitahuan"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
+
+      {/* Floating Pop-Up Success Notification */}
       {success && (
-        <p role="status" className="rounded-xl bg-sage/30 px-4 py-3 text-sm font-medium text-deep-forest">
-          Profil berhasil disimpan.
-        </p>
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed top-24 right-4 sm:right-8 z-50 flex items-start gap-3.5 rounded-2xl border border-forest/20 bg-white/95 backdrop-blur-md p-4 shadow-2xl animate-in slide-in-from-top-4 fade-in-0 duration-300 max-w-sm w-full"
+        >
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest/10 text-forest mt-0.5">
+            <CheckCircle2 className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0 pr-1">
+            <p className="text-sm font-semibold text-ink">Perubahan berhasil disimpan</p>
+            <p className="mt-0.5 text-xs text-mute leading-relaxed">
+              Informasi profil Anda telah berhasil diperbarui dan tersimpan di sistem.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSuccess(false)}
+            className="text-mute hover:text-ink p-1 rounded-lg hover:bg-soft transition cursor-pointer shrink-0"
+            aria-label="Tutup pemberitahuan"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
       )}
 
       <div className="space-y-3">

@@ -1,27 +1,22 @@
 import { requireRole } from "@/lib/session";
-import DashboardSidebar from "@/components/DashboardSidebar";
+import RoleNavbar from "@/components/RoleNavbar";
 
 export const metadata = { title: { default: "Member", template: "%s | TIGA" } };
 
-const MEMBER_LINKS = [
-  { href: "/member/artworks", label: "My Artworks" },
-  { href: "/member/favorites", label: "My Favorites" },
-  { href: "/member/submissions", label: "My Submissions" },
-  { href: "/member/profile", label: "Profile & Account" },
+const NAV_LINKS = [
+  { href: "/#collection", label: "Collection" },
+  { href: "/challenges", label: "Challenges" },
 ];
 
 export default async function MemberLayout({ children }) {
   const user = await requireRole("member");
 
   return (
-    <div className="min-h-screen min-[1000px]:flex bg-white">
-      <DashboardSidebar
-        links={MEMBER_LINKS}
-        subtitle="Member Dashboard"
-        displayName={user.display_name}
-        role="member"
-      />
-      <main className="min-w-0 flex-1 px-4 py-8 sm:px-8 min-[1000px]:py-10">{children}</main>
+    <div className="min-h-screen bg-white flex flex-col">
+      <RoleNavbar user={user} role="member" links={NAV_LINKS} />
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+        {children}
+      </main>
     </div>
   );
 }
