@@ -7,18 +7,19 @@ import Link from "next/link";
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_BYTES = 5 * 1024 * 1024;
 const BASE =
-  "w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-deep-forest outline-none transition focus:ring-2 focus:ring-forest";
+  "w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-mute/50 focus:border-animals focus:ring-1 focus:ring-animals";
 
-function Field({ id, label, error, hint, children }) {
+function Field({ id, label, error, hint, required, children }) {
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-deep-forest">
+      <label htmlFor={id} className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mute">
         {label}
+        {required && <span className="ml-1 text-people">*</span>}
       </label>
       {children}
-      {hint && !error && <p className="mt-1 text-xs text-deep-forest/70">{hint}</p>}
+      {hint && !error && <p className="mt-1 text-xs text-mute">{hint}</p>}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1 text-xs font-medium text-red-700">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs font-medium text-people">
           {error}
         </p>
       )}
@@ -26,7 +27,6 @@ function Field({ id, label, error, hint, children }) {
   );
 }
 
-// mode: "create" | "edit". Saat edit, banner opsional (kosong = tetap memakai banner lama).
 export default function ChallengeForm({ mode, challenge }) {
   const router = useRouter();
   const isEdit = mode === "edit";
@@ -66,11 +66,10 @@ export default function ChallengeForm({ mode, challenge }) {
     const picked = e.target.files?.[0] ?? null;
     setErrors((prev) => ({ ...prev, banner: undefined }));
     if (!picked) return resetFile(null, undefined);
-    // Cek awal untuk kenyamanan. Validasi yang menentukan tetap di backend.
     if (!ACCEPTED.includes(picked.type)) {
-      return resetFile(e.target, "Format banner harus JPG, PNG, WEBP, atau GIF.");
+      return resetFile(e.target, "Banner format must be JPG, PNG, WEBP, or GIF.");
     }
-    if (picked.size > MAX_BYTES) return resetFile(e.target, "Ukuran banner maksimal 5 MB.");
+    if (picked.size > MAX_BYTES) return resetFile(e.target, "Maximum banner size is 5 MB.");
     setFile(picked);
     setPreview(URL.createObjectURL(picked));
   }
@@ -99,7 +98,7 @@ export default function ChallengeForm({ mode, challenge }) {
       router.push("/curator/challenges");
       router.refresh();
     } catch {
-      setFormError("Tidak dapat terhubung ke server. Coba lagi.");
+      setFormError("Unable to reach server. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -112,50 +111,25 @@ export default function ChallengeForm({ mode, challenge }) {
     onChange: handleChange,
     "aria-invalid": errors[name] ? "true" : "false",
     "aria-describedby": errors[name] ? `ch-${name}-error` : undefined,
-    className: `${BASE} ${errors[name] ? "border-red-600" : "border-deep-forest/25"}`,
+    className: `${BASE} ${errors[name] ? "border-people ring-1 ring-people/30" : "border-line hover:border-ink/40"}`,
   });
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="max-w-2xl space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="max-w-2xl space-y-6">
       {formError && (
-        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <div role="alert" className="rounded-xl border border-people/20 bg-people/5 p-4 text-sm font-medium text-people">
           {formError}
-        </p>
+        </div>
       )}
 
-      <Field id="ch-title" label="Judul challenge" error={errors.title}>
-        <input type="text" {...props("title")} />
-      </Field>
-
-      <Field id="ch-description" label="Deskripsi" error={errors.description}>
-        <textarea rows={5} {...props("description")} />
-      </Field>
-
-      <Field id="ch-rules" label="Aturan" error={errors.rules}>
-        <textarea rows={5} {...props("rules")} />
-      </Field>
-
-      <Field id="ch-prize" label="Hadiah" error={errors.prize} hint="Contoh: Rp 2.000.000 + sertifikat">
-        <input type="text" {...props("prize")} />
-      </Field>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field id="ch-startDate" label="Tanggal mulai (WITA)" error={errors.startDate}>
-          <input type="datetime-local" {...props("startDate")} />
-        </Field>
-        <Field id="ch-endDate" label="Tanggal selesai (WITA)" error={errors.endDate}>
-          <input type="datetime-local" {...props("endDate")} />
-        </Field>
-      </div>
-
-      <div>
-        <label htmlFor="ch-banner" className="mb-1.5 block text-sm font-medium text-deep-forest">
-          Gambar banner
+      <div className="rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <label htmlFor="ch-banner" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-mute">
+          Challenge Banner {!isEdit && <span className="text-people">*</span>}
         </label>
         {isEdit && !preview && (
-          <div className="mb-3 overflow-hidden rounded-xl border border-deep-forest/10 bg-white">
+          <div className="mb-4 overflow-hidden rounded-xl border border-ink/10 bg-soft">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={challenge.bannerUrl} alt="Banner saat ini" className="aspect-[3/1] w-full object-cover" />
+            <img src={challenge.bannerUrl} alt="Current banner" className="aspect-[3/1] w-full object-cover" />
           </div>
         )}
         <input
@@ -165,40 +139,75 @@ export default function ChallengeForm({ mode, challenge }) {
           onChange={handleFile}
           aria-invalid={errors.banner ? "true" : "false"}
           aria-describedby={errors.banner ? "ch-banner-error" : "ch-banner-hint"}
-          className="block w-full text-sm text-deep-forest file:mr-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-forest file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ivory hover:file:bg-deep-forest"
+          className="block w-full text-sm text-ink file:mr-4 file:cursor-pointer file:rounded-full file:border-0 file:bg-animals file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white hover:file:opacity-90 transition"
         />
         {!errors.banner && (
-          <p id="ch-banner-hint" className="mt-1 text-xs text-deep-forest/70">
-            JPG, PNG, WEBP, atau GIF, maksimal 5 MB.
-            {isEdit && " Kosongkan untuk tetap memakai banner saat ini."}
+          <p id="ch-banner-hint" className="mt-1.5 text-xs text-mute">
+            JPG, PNG, WEBP, or GIF. Max 5 MB. Aspect ratio 3:1 recommended.
+            {isEdit && " Leave empty to keep the current banner."}
           </p>
         )}
         {errors.banner && (
-          <p id="ch-banner-error" role="alert" className="mt-1 text-xs font-medium text-red-700">
+          <p id="ch-banner-error" role="alert" className="mt-1.5 text-xs font-medium text-people">
             {errors.banner}
           </p>
         )}
         {preview && (
-          <div className="mt-3 overflow-hidden rounded-xl border border-deep-forest/10 bg-white">
+          <div className="mt-4 overflow-hidden rounded-xl border border-ink/10 bg-soft">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={preview} alt="Pratinjau banner" className="aspect-[3/1] w-full object-cover" />
+            <img src={preview} alt="Banner preview" className="aspect-[3/1] w-full object-cover" />
           </div>
         )}
       </div>
 
-      <div className="flex gap-3">
+      <div className="space-y-4 rounded-2xl border border-line bg-white p-6 shadow-sm">
+        <Field id="ch-title" label="Challenge Title" error={errors.title} required>
+          <input type="text" placeholder="e.g. Echoes of the Peat Fires" {...props("title")} />
+        </Field>
+
+        <Field id="ch-description" label="Description" error={errors.description} required>
+          <textarea
+            rows={4}
+            placeholder="Describe the context, themes, and prompt for creators..."
+            {...props("description")}
+          />
+        </Field>
+
+        <Field id="ch-rules" label="Rules & Guidelines" error={errors.rules} required>
+          <textarea
+            rows={4}
+            placeholder="Submission requirements, original artwork policies, eligibility..."
+            {...props("rules")}
+          />
+        </Field>
+
+        <Field id="ch-prize" label="Prize" error={errors.prize} hint="e.g. IDR 2,500,000 + Exhibition Feature" required>
+          <input type="text" placeholder="IDR 2,500,000" {...props("prize")} />
+        </Field>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field id="ch-startDate" label="Start Date (WITA)" error={errors.startDate} required>
+            <input type="datetime-local" {...props("startDate")} />
+          </Field>
+          <Field id="ch-endDate" label="End Date (WITA)" error={errors.endDate} required>
+            <input type="datetime-local" {...props("endDate")} />
+          </Field>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3">
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-forest px-6 py-2.5 text-sm font-semibold text-ivory transition hover:bg-deep-forest disabled:cursor-not-allowed disabled:opacity-60"
+          className="rounded-full bg-animals px-7 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Menyimpan..." : isEdit ? "Simpan Perubahan" : "Buat Challenge"}
+          {loading ? "Saving..." : isEdit ? "Save Changes" : "Create Challenge"}
         </button>
         <Link
           href="/curator/challenges"
-          className="rounded-xl border border-deep-forest/25 px-6 py-2.5 text-sm font-semibold text-deep-forest transition hover:bg-white"
+          className="rounded-full border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink hover:bg-soft"
         >
-          Batal
+          Cancel
         </Link>
       </div>
     </form>
