@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import ArtworkCard from "@/components/ArtworkCard";
-import TigaBloomGallery from "./TigaBloomGallery";
+import CardInteractionButtons from "@/components/artwork/CardInteractionButtons";
 
 const ISSUE_TAGS = [
   "palm oil expansion",
@@ -56,7 +56,7 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTag, setSelectedTag] = useState("");
   const [sort, setSort] = useState("newest"); // "newest" | "popular" | "az"
-  const [viewMode, setViewMode] = useState("bloom"); // "bloom" | "grid" | "list"
+  const [viewMode, setViewMode] = useState("grid"); // "grid" | "list"
 
   // Count per category
   const categoryCounts = useMemo(() => {
@@ -364,19 +364,9 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
         <div className="flex items-center gap-1 rounded-lg border border-line bg-soft p-0.5">
           <button
             type="button"
-            onClick={() => setViewMode("bloom")}
-            aria-label="Interactive Bloom view"
-            className={`px-3 py-1 rounded text-xs transition ${
-              viewMode === "bloom" ? "bg-white text-ink font-semibold shadow-xs" : "text-mute hover:text-ink"
-            }`}
-          >
-            Bloom
-          </button>
-          <button
-            type="button"
             onClick={() => setViewMode("grid")}
             aria-label="Grid view"
-            className={`px-3 py-1 rounded text-xs transition ${
+            className={`px-3 py-1 rounded text-xs transition cursor-pointer ${
               viewMode === "grid" ? "bg-white text-ink font-semibold shadow-xs" : "text-mute hover:text-ink"
             }`}
           >
@@ -386,7 +376,7 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
             type="button"
             onClick={() => setViewMode("list")}
             aria-label="List view"
-            className={`px-3 py-1 rounded text-xs transition ${
+            className={`px-3 py-1 rounded text-xs transition cursor-pointer ${
               viewMode === "list" ? "bg-white text-ink font-semibold shadow-xs" : "text-mute hover:text-ink"
             }`}
           >
@@ -395,7 +385,7 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
         </div>
       </div>
 
-      {/* Catalog Display: Bloom, Grid, or List */}
+      {/* Catalog Display: Grid or List */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-line bg-soft/50 px-6 py-16 text-center space-y-3">
           <p className="font-display text-2xl font-semibold text-ink">
@@ -407,15 +397,13 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
           <button
             type="button"
             onClick={clearFilters}
-            className="inline-block rounded-full bg-ink px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-people transition"
+            className="inline-block rounded-full bg-ink px-6 py-2.5 text-xs font-semibold uppercase tracking-wider text-white hover:bg-people transition cursor-pointer"
           >
             Clear filters
           </button>
         </div>
-      ) : viewMode === "bloom" ? (
-        <TigaBloomGallery artworks={filtered} />
       ) : viewMode === "grid" ? (
-        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {filtered.map((art) => (
             <li key={art.id}>
               <ArtworkCard artwork={art} userRole={user?.role} />
@@ -455,8 +443,8 @@ export default function CollectionCatalog({ initialArtworks = [], categories = [
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 shrink-0 text-xs text-mute">
-                <span className="font-medium text-ink">{art.like_count || 0} likes</span>
+              <div className="flex items-center gap-4 shrink-0 text-xs text-mute">
+                <CardInteractionButtons artwork={art} userRole={user?.role} variant="row" />
                 <Link
                   href={`/artworks/${art.id}`}
                   className="rounded-full border border-line px-4 py-1.5 text-xs font-semibold text-ink hover:border-ink hover:bg-white transition"
